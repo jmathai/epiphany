@@ -1,46 +1,38 @@
 <?php
 /*
-* Class:        EpiCode
-* Description:  Minimalistic framework for PHP
-* Authors:      Jaisen Mathai <jaisen@jmathai.com>
-*               John Mcfarlane <john.mcfarlane@rockfloat.com>
-*/
+ * Class:        EpiCode
+ * Description:  Minimalistic framework for PHP
+ * Authors:      Jaisen Mathai <jaisen@jmathai.com>
+ *               John Mcfarlane <john.mcfarlane@rockfloat.com>
+ */
 
-/*
-* EpiCode defines constants if they do not yet exist
-* Define these constants prior to including this file if you have a custom directory structure
-*/
-
-// EPICODE_VIEWS is the full path to the directory that contains the views (default :: ./views)
-if(!defined('EPICODE_VIEWS'))
-{
-  define('EPICODE_VIEWS', dirname(__FILE__) . '/views');
-}
-
-// EPICODE_BASE is the full path to the directory that contains your core files (default :: ../)
-if(!defined('EPICODE_BASE'))
-{
-  define('EPICODE_BASE', dirname(dirname(__FILE__)));
-}
+// Require the error handling class
+require_once dirname(__FILE__) . '/EpiError.php';
 
 final class EpiCode
 {
   public static function display($template = null, $vars = null)
   {
-    $templateInclude = EPICODE_VIEWS . '/' . $template;
-    if(is_file($templateInclude))
+    try
     {
-      if(is_array($vars))
+      $templateInclude = EPICODE_VIEWS . '/' . $template;
+      if(is_file($templateInclude))
       {
-        extract($vars);
+        if(is_array($vars))
+        {
+          extract($vars);
+        }
+        
+        include $templateInclude;
       }
-      
-      include $templateInclude;
+      else
+      {
+        throw new EpiError(EpiError::EPI_ERROR_TEMPLATE);
+      }
     }
-    else
+    catch(EpiError $e)
     {
-      // raise an error?
-      echo 'Could not find ' . $templateInclude;
+      $e->handler();
     }
   }
   
@@ -52,18 +44,41 @@ final class EpiCode
       
       if(isset($routes[$route]))
       {
-        $class = $routes[$route][0];
-        $method= $routes[$route][1];
-        include_once PATH_MODEL . '/' . $class . '.php';
-        
-        if(class_exists($class) && method_exists($class, $method))
+        $arg1  = $routes[$route][0];
+        $arg2  = $routes[$route][1];
+
+        switch($arg1)
         {
-          call_user_func(array($class, $method));
-        }
-        else
-        {
-          // raise an error?
-          echo 'Could not call ' . $class . '::' . $method;
+          case ':function:':
+            try
+            {
+              if(function_exists($arg2))
+              {
+                call_user_func($arg2);
+              }
+              else
+              {
+                throw new EpiError(EpiError::EPI_ERROR_FUNCTION, "Could not call function {$arg2}");
+              }
+            }
+            catch(EpiError $e)
+            {
+              $e->handler();
+            }
+            break;
+          default:
+            try
+            {
+              if(!call_user_func(array($class, $method)))
+              {
+                throw new EpiError("Could not call {$arg1}::{$arg2}", EpiError::EPI_ERROR_METHOD);
+              }
+            }
+            catch(EpiError $e)
+            {
+              $e->handler();
+            }
+            break;
         }
       }
       else
@@ -84,29 +99,54 @@ final class EpiCode
   {
     if(strncmp(EPICODE_BASE, $template, strlen(EPICODE_BASE)) == 0)
     {
-      include $template;
+      try
+      {
+        include $template;
+      }
+      catch(EpiError $e)
+      {
+        throw new EpiError("Could not insert file ({$template})", EpiError::EPI_ERROR_INSERT);
+      }
     }
   }
   
   public static function json($data)
   {
-    return json_encode($data);
+    try
+    {
+      return json_encode($data);
+    }
+    catch(EpiError $e)
+    {
+      throw new EpiError("Could not json encode data", EpiError::EPI_ERROR_JSON);
+    }
   }
   
   public static function jsonResponse($data)
   {
-    header('X-JSON: (' . json_encode($data) . ')');
-    header('Content-type: application/x-json');
-    echo json_encode($data);
-    die();
+    try
+    {
+      header('X-JSON: (' . json_encode($data) . ')');
+      header('Content-type: application/x-json');
+      echo json_encode($data);
+      die();
+    }
+    catch(EpiError $e)
+    {
+      throw new EpiError("Could not json encode data", EpiError::EPI_ERROR_JSON);
+    }
   }
   
   public static function redirect($url = null)
   {
-    if($url !== null)
+    try
     {
       header('Location: ' . $url);
       die();
+    }
+    catch(EpiError $e)
+    {
+      throw new EpiError("Could not redirect to {$url}", EpiError::EPI_ERROR_REDIRECT);
     }
   }
   
@@ -115,5 +155,66 @@ final class EpiCode
     echo $contents;
     return true;
   }
+}
+
+abstract class EpiAbstract extends Exception
+{
+  const EPI_ERROR_ROUTE     = 1;
+  const EPI_ERROR_TEMPLATE  = 2;
+  const EPI_ERROR_METHOD    = 3;
+  const EPI_ERROR_FUNCTION  = 4;
+  const EPI_ERROR_FILE      = 5;
+  const EPI_ERROR_INSERT    = 6;
+  const EPI_ERROR_JSON      = 7;
+  const EPI_ERROR_REDIRECT  = 8;
+  
+  public function __construct($code, $message = '')
+  {
+    parent::__construct($message, $code);
+  }
+
+  public function handler()
+  {
+    switch($this->getCode())
+    {
+      case self::EPI_ERROR_ROUTE:
+        $method = '_route';
+        break;
+      case self::EPI_ERROR_TEMPLATE:
+        $method = '_template';
+        break;
+      case self::EPI_ERROR_METHOD:
+        $method = '_method';
+        break;
+      case self::EPI_ERROR_FUNCTION:
+        $method = '_function';
+        break;
+      case self::EPI_ERROR_FILE:
+        $method = '_file';
+        break;
+      case self::EPI_ERROR_JSON:
+        $method = '_json';
+        break;
+      case self::EPI_ERROR_REDIRECT:
+        $method = '_json';
+        break;
+    }
+
+    if(isset($method))
+    {
+      return call_user_func(array($this, $method));
+    }
+  }
+  
+  /*
+   * Abstract methods to be defined in EpiError class
+   */
+  abstract protected function _route();
+  abstract protected function _template();
+  abstract protected function _method();
+  abstract protected function _function();
+  abstract protected function _file();
+  abstract protected function _json();
+  abstract protected function _redirect();
 }
 ?>
