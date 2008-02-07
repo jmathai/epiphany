@@ -69,9 +69,13 @@ final class EpiCode
           default:
             try
             {
-              if(!call_user_func(array($class, $method)))
+              if(method_exists($arg1, $arg2))
               {
-                throw new EpiError("Could not call {$arg1}::{$arg2}", EpiError::EPI_ERROR_METHOD);
+                call_user_func(array($arg1, $arg2));
+              }
+              else
+              {
+                throw new EpiError(EpiError::EPI_ERROR_METHOD, "Could not call {$arg1}::{$arg2}");
               }
             }
             catch(EpiError $e)
@@ -105,7 +109,7 @@ final class EpiCode
       }
       catch(EpiError $e)
       {
-        throw new EpiError("Could not insert file ({$template})", EpiError::EPI_ERROR_INSERT);
+        throw new EpiError(EpiError::EPI_ERROR_INSERT, "Could not insert file ({$template})");
       }
     }
   }
@@ -118,7 +122,7 @@ final class EpiCode
     }
     catch(EpiError $e)
     {
-      throw new EpiError("Could not json encode data", EpiError::EPI_ERROR_JSON);
+      throw new EpiError(EpiError::EPI_ERROR_JSON, "Could not json encode data");
     }
   }
   
@@ -133,7 +137,7 @@ final class EpiCode
     }
     catch(EpiError $e)
     {
-      throw new EpiError("Could not json encode data", EpiError::EPI_ERROR_JSON);
+      throw new EpiError(EpiError::EPI_ERROR_JSON, "Could not json encode data");
     }
   }
   
@@ -146,7 +150,7 @@ final class EpiCode
     }
     catch(EpiError $e)
     {
-      throw new EpiError("Could not redirect to {$url}", EpiError::EPI_ERROR_REDIRECT);
+      throw new EpiError(EpiError::EPI_ERROR_REDIRECT, "Could not redirect to {$url}");
     }
   }
   
