@@ -58,7 +58,41 @@ final class EpiCode
               }
               else
               {
-                throw new EpiError(EpiError::EPI_ERROR_FUNCTION, "Could not call function {$arg2}");
+                throw new EpiError(EpiError::EPI_ERROR_FUNCTION);
+              }
+            }
+            catch(EpiError $e)
+            {
+              $e->handler();
+            }
+            break;
+          case ':json:':
+            try
+            {
+              if(isset($arg2))
+              {
+                self::jsonResponse($arg2);
+              }
+              else
+              {
+                throw new EpiError(EpiError::EPI_ERROR_JSON);
+              }
+            }
+            catch(EpiError $e)
+            {
+              $e->handler();
+            }
+            break;
+          case ':redirect:':
+            try
+            {
+              if($arg2 != '')
+              {
+                self::redirect($arg2);
+              }
+              else
+              {
+                throw new EpiError(EpiError::EPI_ERROR_REDIRECT);
               }
             }
             catch(EpiError $e)
@@ -75,7 +109,7 @@ final class EpiCode
               }
               else
               {
-                throw new EpiError(EpiError::EPI_ERROR_METHOD, "Could not call {$arg1}::{$arg2}");
+                throw new EpiError(EpiError::EPI_ERROR_METHOD);
               }
             }
             catch(EpiError $e)
@@ -95,22 +129,33 @@ final class EpiCode
     }
     else
     {
-      return false;
+      try
+      {
+        throw new EpiError(EpiError::EPI_ERROR_ROUTE);
+      }
+      catch(EpiError $e)
+      {
+        $e->handler();
+      }
     }
   }
   
   public static function insert($template = null)
   {
-    if(strncmp(EPICODE_BASE, $template, strlen(EPICODE_BASE)) == 0)
+    try
     {
-      try
+      if(file_exists($template))
       {
         include $template;
       }
-      catch(EpiError $e)
+      else
       {
-        throw new EpiError(EpiError::EPI_ERROR_INSERT, "Could not insert file ({$template})");
+        throw new EpiError(EpiError::EPI_ERROR_INSERT);
       }
+    }
+    catch(EpiError $e)
+    {
+      $e->handler();
     }
   }
   
@@ -118,39 +163,46 @@ final class EpiCode
   {
     try
     {
-      return json_encode($data);
+      if($retval = json_encode($data))
+      {
+        return $retval;
+      }
+      else
+      {
+        throw new EpiError(EpiError::EPI_ERROR_JSON);
+      }
     }
     catch(EpiError $e)
     {
-      throw new EpiError(EpiError::EPI_ERROR_JSON, "Could not json encode data");
+      $e->handler();
     }
   }
   
   public static function jsonResponse($data)
   {
-    try
-    {
-      header('X-JSON: (' . json_encode($data) . ')');
-      header('Content-type: application/x-json');
-      echo json_encode($data);
-      die();
-    }
-    catch(EpiError $e)
-    {
-      throw new EpiError(EpiError::EPI_ERROR_JSON, "Could not json encode data");
-    }
+    header('X-JSON: (' . json_encode($data) . ')');
+    header('Content-type: application/x-json');
+    echo self::json($data);
+    die();
   }
   
   public static function redirect($url = null)
   {
     try
     {
-      header('Location: ' . $url);
-      die();
+      if($url != '')
+      {
+        header('Location: ' . $url);
+        die();
+      }
+      else
+      {
+        throw new EpiError(EpiError::EPI_ERROR_REDIRECT);
+      }
     }
     catch(EpiError $e)
     {
-      throw new EpiError(EpiError::EPI_ERROR_REDIRECT, "Could not redirect to {$url}");
+      $e->handler();
     }
   }
   

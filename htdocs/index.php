@@ -11,19 +11,16 @@
                   ''                => array(':function:', 'Home'), // yoursite.com
                   'sample'          => array(':function:', 'MyFunction'), // yoursite.com/sample
                   'sample/method'   => array('MyClass', 'MyMethod'), // yoursite.com/sample/method
+                  'json'            => array(':json:', array(1,2,3,4,5,6,7,8,9)), // yoursite.com/json
                   'function/error'  => array(':function:', 'UndefinedFunction'), // yoursite.com/function/error
                   'source'          => array(':function:', 'ViewSource'), // yoursite.com/source
                   'sample/redirect' => array(':redirect:', 'http://www.google.com') // yoursite.com/sample/redirect
                 );
   include_once '../php/EpiCode.php';
   
-  
-  if(EpiCode::getRoute($_GET['__route__'], $_['routes']) === false)
-  {
-    echo 'Unhandled route on line ' . __LINE__ . ' of ' . __FILE__;
-  }
+  EpiCode::getRoute($_GET['__route__'], $_['routes']); 
 
-  
+
   /*
    * ******************************************************************************************
    * Define functions and classes which are executed by EpiCode based on the $_['routes'] array
@@ -35,6 +32,7 @@
           <ul>
             <li><a href="/sample">Call a function</a></li>
             <li><a href="/sample/method">Call a method</a></li>
+            <li><a href="/json">Output some JSON</a></li>
             <li><a href="/function/error">Call a function that does not exist</a></li>
             <li><a href="/source">View the source of this page</a></li>
             <li><a href="/sample/redirect">Redirect to Google</a></li>
