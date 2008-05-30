@@ -75,76 +75,20 @@ final class EpiCode
         $arg1  = $routes[$route][0];
         $arg2  = $routes[$route][1];
 
-        switch($arg1)
+        try
         {
-          case ':function:':
-            try
-            {
-              if(function_exists($arg2))
-              {
-                call_user_func($arg2);
-              }
-              else
-              {
-                throw new EpiError(EpiError::EPI_ERROR_FUNCTION);
-              }
-            }
-            catch(EpiError $e)
-            {
-              $e->handler();
-            }
-            break;
-          case ':json:':
-            try
-            {
-              if(isset($arg2))
-              {
-                self::jsonResponse($arg2);
-              }
-              else
-              {
-                throw new EpiError(EpiError::EPI_ERROR_JSON);
-              }
-            }
-            catch(EpiError $e)
-            {
-              $e->handler();
-            }
-            break;
-          case ':redirect:':
-            try
-            {
-              if($arg2 != '')
-              {
-                self::redirect($arg2);
-              }
-              else
-              {
-                throw new EpiError(EpiError::EPI_ERROR_REDIRECT);
-              }
-            }
-            catch(EpiError $e)
-            {
-              $e->handler();
-            }
-            break;
-          default:
-            try
-            {
-              if(method_exists($arg1, $arg2))
-              {
-                call_user_func(array($arg1, $arg2));
-              }
-              else
-              {
-                throw new EpiError(EpiError::EPI_ERROR_METHOD);
-              }
-            }
-            catch(EpiError $e)
-            {
-              $e->handler();
-            }
-            break;
+          if(method_exists($arg1, $arg2))
+          {
+            call_user_func(array($arg1, $arg2));
+          }
+          else
+          {
+            throw new EpiError(EpiError::EPI_ERROR_METHOD);
+          }
+        }
+        catch(EpiError $e)
+        {
+          $e->handler();
         }
       }
       else
