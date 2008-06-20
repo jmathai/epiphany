@@ -64,6 +64,12 @@ class EpiForm
     return '<input type="hidden" name="__EpiForm__" value=\'' . json_encode($this->fields) . '\' />';
   }
 
+  public function repopulate($str)
+  {
+    $fields = EpiFormServer::decode($str);
+    return 'YAHOO.formValidator.repopulate(' . $fields . ');';
+  }
+
   public function validateJS()
   {
     // YAHOO.formValidator.init({"form":"f","defs":[{"el":"i","type":"maxChars","params":5,"event":["keyup","mouseup"]}]});
@@ -79,11 +85,11 @@ class EpiForm
     $retval = 'YAHOO.formValidator.init(' . json_encode($retval) . ');';
     if($this->pass)
     {
-      $retval .= 'YAHOO.formValidator.pass = ' . $this->pass . ';';
+      $retval .= 'YAHOO.formValidator.pass = ' . trim($this->pass) . ';';
     }
     if($this->fail)
     {
-      $retval .= 'YAHOO.formValidator.fail = ' . $this->fail . ';';
+      $retval .= 'YAHOO.formValidator.fail = ' . trim($this->fail) . ';';
     }
 
     return $retval;
@@ -93,6 +99,7 @@ class EpiForm
   {
     $this->fields[$this->currentField]['type'] = array('rule' => 'maxChars', 'args' => (string)$args);
   }
+
 /*  
   public static function addField($idOfField = null, $validationType = null, $prepareForServer = null)
   {
@@ -196,5 +203,61 @@ class EpiForm
     return $retval;
   }
 */
+}
+
+class EpiFormServer
+{
+  public static $definitions;
+
+  public static function checkFields()
+  {
+    $retval = 0;
+    if(count(self::$definitions) == 0)
+    {
+      self::$definitions = self::generateDefinitions();
+    }
+
+    foreach(self::$definitions as $def)
+    {
+      $slot = $def['slot'];
+      $name = $def['id'];
+      $type = '_' . $def['type']['rule'];
+      $args = $def['type']['args'];
+
+      if(self::$type($_REQUEST[$name], $args))
+      {
+        $retval += $slot;
+      }
+
+    }
+
+    return $retval;
+  }
+
+  public static function encode($_post = null)
+  {
+    if($_post === null)
+    {
+      $_post = $_POST;
+    }
+
+    return base64_encode(json_encode($_post));
+  }
+
+  public static function decode($str)
+  {
+    return base64_decode($str);
+  }
+
+  private static function generateDefinitions()
+  {
+    self::$definitions = json_decode($_REQUEST['__EpiForm__'], 1);
+    return self::$definitions;
+  }
+
+  private static function _maxChars($val, $args)
+  {
+    return mb_strlen($val) > $args; // false if longer than $args
+  }
 }
 ?>

@@ -1,5 +1,15 @@
 <?php
   include '../php/EpiForm.php';
+  
+  if(count($_POST) > 0)
+  {
+    $val = new EpiFormServer();
+    if($val->checkFields() > 0)
+    {
+      header('Location: ' . $_SERVER['PHP_SELF'] . '?__epi__=' . EpiFormServer::encode($_POST));
+      die();
+    }
+  }
   $form = EpiForm::addForm('f');
   //$form->debug(true);
   $form->addField('i')->addType('maxChars', 5)->addEvent('keyup')->addEvent('mouseup')->addMessage('Cannot be more then 5 chars');
@@ -22,13 +32,19 @@
     </script>
   </head>
 <body>
-  <form id="f">
-    <input type="text" id="i" value="test" />
+  <form id="f" method="post">
+    <input type="text" name="i" id="i" value="test" />
     <input type="submit" value="submit" id="s" />
     <?php echo $form->prepareForServer(); ?>
   </form>
   <script>
-    <?php echo $form->validateJS(); ?>
+    <?php //echo $form->validateJS(); ?>
+    <?php
+      if(isset($_GET['__epi__']))
+      {
+        echo $form->repopulate($_GET['__epi__']);
+      }
+    ?>
   </script>
 </body>
 </html>

@@ -99,6 +99,17 @@ YAHOO.formValidator = function()
       }
     },
 
+    repopulate: function(aElements)
+    {
+      for(name in aElements)
+      {
+        if(YAHOO.lang.hasOwnProperty(aElements, name))
+        {
+          YAHOO.util.Dom.get(name).value = aElements[name];
+        }
+      }
+    },
+
     validate: function(e)
     {
       var retval = true;
