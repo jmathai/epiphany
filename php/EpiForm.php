@@ -9,11 +9,7 @@ class EpiForm
   private $debug = false;
   private $pass = null;
   private $fail = null;
-
-  public static function addForm($id)
-  {
-    return new EpiForm($id);
-  }
+  private $jsInit = null;
 
   public function __construct($id)
   {
@@ -44,46 +40,22 @@ class EpiForm
     return $this;
   }
 
-  public function debug($bool)
+  public function setDebug($bool)
   {
     $this->debug = (boolean)$bool;
     return $this;
   }
 
-  public function overloadPass($js)
+  public function getClientValidationJS()
   {
-    $this->pass = $js;
-  }
-
-  public function overloadFail($js)
-  {
-    $this->fail = $js;
-  }
-
-  public function prepareForServer()
-  {
-    return '<input type="hidden" name="' . self::__FIELD__ . '" value=\'' . json_encode($this->fields) . '\' />';
-  }
-
-  public function repopulate($str)
-  {
-    $fields = EpiFormServer::decode($str);
-    return 'YAHOO.formValidator.repopulate(' . $fields . ');';
-  }
-
-  public function validateJS()
-  {
-    // YAHOO.formValidator.init({"form":"f","defs":[{"el":"i","type":"maxChars","params":5,"event":["keyup","mouseup"]}]});
     $retval = array();
-    $retval['form'] = $this->id;
-    $retval['debug']= $this->debug;
     $retval['defs'] = array();
     foreach($this->fields as $i => $field)
     {
       $retval['defs'][$i] = array('el' => $field['id'], 'type' => $field['type']['rule'], 'args' => $field['type']['args'], 'event' => $field['events'], 'msg' => $field['msg']);
     }
 
-    $retval = 'YAHOO.formValidator.init(' . json_encode($retval) . ');';
+    $retval = $this->_jsInit() . 'YAHOO.formValidator.initClientValidation(' . json_encode($retval) . ');';
     if($this->pass)
     {
       $retval .= 'YAHOO.formValidator.pass = ' . trim($this->pass) . ';';
@@ -91,6 +63,40 @@ class EpiForm
     if($this->fail)
     {
       $retval .= 'YAHOO.formValidator.fail = ' . trim($this->fail) . ';';
+    }
+
+    return $retval;
+  }
+
+  public function getFieldForServer()
+  {
+    return '<input type="hidden" name="' . self::__FIELD__ . '" value=\'' . json_encode($this->fields) . '\' />';
+  }
+
+  public function getRepopulateJS($str)
+  {
+    $fields = EpiFormServer::getDecodedString($str);
+    return $this->_jsInit() . 'YAHOO.formValidator.repopulate(' . $fields . ');';
+  }
+
+  public function setPassFunction($js)
+  {
+    $this->pass = $js;
+  }
+
+  public function setFailFunction($js)
+  {
+    $this->fail = $js;
+  }
+
+  private function _jsInit()
+  {
+    $retval = '';
+    if($this->jsInit == null)
+    {
+      $args['form'] = $this->id;
+      $args['debug']= $this->debug;
+      $retval = 'YAHOO.formValidator.init(' . json_encode($args) . ');';
     }
 
     return $retval;
@@ -104,17 +110,17 @@ class EpiForm
 
 class EpiFormServer
 {
-  public static $definitions;
+  private $definitions;
 
-  public static function checkFields()
+  public function __construct()
+  {
+    $this->definitions = $this->getDefinitions();
+  }
+
+  public function getResult()
   {
     $retval = 0;
-    if(empty(self::$definitions))
-    {
-      self::$definitions = self::generateDefinitions();
-    }
-
-    foreach(self::$definitions as $def)
+    foreach($this->definitions as $def)
     {
       $slot = $def['slot'];
       $name = $def['id'];
@@ -131,7 +137,21 @@ class EpiFormServer
     return $retval;
   }
 
-  public static function encode($_post = null)
+  public function getFieldsByError($result = 0)
+  {
+    $retval = array();
+    foreach($this->definitions as $field)
+    {
+      if(($field['slot'] & $errorCode) == $field['slot'])
+      {
+        $retval[] = $field['id'];
+      }
+    }
+
+    return $retval;
+  }
+
+  public function getEncodedString($_post = null)
   {
     if($_post === null)
     {
@@ -142,19 +162,15 @@ class EpiFormServer
     return base64_encode(json_encode($_post));
   }
 
-  public static function decode($str)
+  public function getDecodedString($str)
   {
     return base64_decode($str);
   }
 
-  private static function generateDefinitions()
+  private function getDefinitions()
   {
-    if(empty(self::$definitions))
-    {
-      self::$definitions = json_decode($_REQUEST[EpiForm::__FIELD__], 1);
-    }
-
-    return (array) self::$definitions;
+    $this->definitions = json_decode($_REQUEST[EpiForm::__FIELD__], 1);
+    return (array) $this->definitions;
   }
 
   private static function _maxChars($val, $args)

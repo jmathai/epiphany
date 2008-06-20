@@ -4,9 +4,9 @@
   if(count($_POST) > 0)
   {
     $val = new EpiFormServer();
-    if($val->checkFields() > 0)
+    if($val->getResult() > 0)
     {
-      header('Location: ' . $_SERVER['PHP_SELF'] . '?__epi__=' . EpiFormServer::encode($_POST));
+      header('Location: ' . $_SERVER['PHP_SELF'] . '?__epi__=' . $val->getEncodedString($_POST));
       die();
     }
     else
@@ -15,12 +15,12 @@
       die();
     }
   }
-  $form = EpiForm::addForm('f');
+  $form = new EpiForm('f');
   //$form->debug(true);
   $form->addField('i')->addType('maxChars', 5)->addEvent('keyup')->addMessage('Cannot be more then 5 chars');
   //$form->addField('i')->addType('maxChars', 5)->addMessage('Cannot be more then 5 chars');
-  $form->overloadFail('function(aDef){ YAHOO.util.Dom.setStyle(aDef.el+"-div", "background-color", "red"); YAHOO.util.Dom.get(aDef.el+"-msg").innerHTML=aDef.msg; }');
-  $form->overloadPass('function(aDef){ YAHOO.util.Dom.setStyle(aDef.el+"-div", "background-color", ""); YAHOO.util.Dom.get(aDef.el+"-msg").innerHTML=""; }');
+  $form->setFailFunction('function(aDef){ YAHOO.util.Dom.setStyle(aDef.el+"-div", "background-color", "red"); YAHOO.util.Dom.get(aDef.el+"-msg").innerHTML=aDef.msg; }');
+  $form->setPassFunction('function(aDef){ YAHOO.util.Dom.setStyle(aDef.el+"-div", "background-color", ""); YAHOO.util.Dom.get(aDef.el+"-msg").innerHTML=""; }');
 ?>
 <html>
   <head>
@@ -50,14 +50,14 @@
       <div id="i-msg"></div>
     </div>
     <input type="submit" value="submit" id="s" />
-    <?php echo $form->prepareForServer(); ?>
+    <?php echo $form->getFieldForServer(); ?>
   </form>
   <script>
-    <?php echo $form->validateJS(); ?>
+    <?php echo $form->getClientValidationJS(); ?>
     <?php
       if(isset($_GET['__epi__']))
       {
-        echo $form->repopulate($_GET['__epi__']);
+        echo $form->getRepopulateJS($_GET['__epi__']);
       }
     ?>
   </script>

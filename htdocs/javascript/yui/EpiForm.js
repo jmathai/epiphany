@@ -62,8 +62,12 @@ YAHOO.formValidator = function()
     init: function(aArgs)
     {
       debug= aArgs.debug;
-      defs = aArgs.defs;
       form = YAHOO.util.Dom.get(aArgs.form);
+    },
+
+    initClientValidation: function(aArgs)
+    {
+      defs = aArgs.defs;
       YAHOO.util.Event.onDOMReady(function(){ 
           this.getElements();
           YAHOO.util.Event.addListener(form, "submit", this.validate, this, true);
@@ -111,7 +115,7 @@ YAHOO.formValidator = function()
       {
         if(YAHOO.lang.hasOwnProperty(aElements, name))
         {
-          el = YAHOO.util.Dom.get(name);
+          el = form[name];
           if(el)
           {
             el.value = aElements[name];
