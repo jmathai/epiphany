@@ -9,6 +9,11 @@
       header('Location: ' . $_SERVER['PHP_SELF'] . '?__epi__=' . EpiFormServer::encode($_POST));
       die();
     }
+    else
+    {
+      header('Location: ' . $_SERVER['PHP_SELF'] . '?success=1');
+      die();
+    }
   }
   $form = EpiForm::addForm('f');
   //$form->debug(true);
@@ -36,10 +41,12 @@
 <body>
   <?php
     if(isset($_GET['__epi__'])){ echo '<div style="padding:10; margin:10; background:pink; text-align:center;">Error with your form</div>'; }
+    elseif(isset($_GET['success'])){ echo '<div style="padding:10; margin:10; background:green; text-align:center;">Form submitted successfully</div>'; }
   ?>
   <form id="f" method="post" action="<?php echo $_SERVER['PHP_SELF']; ?>">
     <div id="i-div" style="padding:10px; border:solid 1px #ccc;">
-      <input type="text" name="i" value="test" />
+      <div>Enter up to 5 characters below</div>
+      <input type="text" name="i" value="" />
       <div id="i-msg"></div>
     </div>
     <input type="submit" value="submit" id="s" />
