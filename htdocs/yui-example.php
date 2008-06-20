@@ -34,7 +34,10 @@
     </script>
   </head>
 <body>
-  <form id="f" method="post">
+  <?php
+    if(isset($_GET['__epi__'])){ echo '<div style="padding:10; margin:10; background:pink; text-align:center;">Error with your form</div>'; }
+  ?>
+  <form id="f" method="post" action="<?php echo $_SERVER['PHP_SELF']; ?>">
     <div id="i-div" style="padding:10px; border:solid 1px #ccc;">
       <input type="text" name="i" value="test" />
       <div id="i-msg"></div>
