@@ -1,6 +1,7 @@
 <?php
 class EpiForm
 {
+  const __FIELD__ = '__EpiForm__';
   private $id;
   private $fields = array();
   private $slot   = 0;
@@ -61,7 +62,7 @@ class EpiForm
 
   public function prepareForServer()
   {
-    return '<input type="hidden" name="__EpiForm__" value=\'' . json_encode($this->fields) . '\' />';
+    return '<input type="hidden" name="' . self::__FIELD__ . '" value=\'' . json_encode($this->fields) . '\' />';
   }
 
   public function repopulate($str)
@@ -108,7 +109,7 @@ class EpiFormServer
   public static function checkFields()
   {
     $retval = 0;
-    if(count(self::$definitions) == 0)
+    if(empty(self::$definitions))
     {
       self::$definitions = self::generateDefinitions();
     }
@@ -136,6 +137,7 @@ class EpiFormServer
     {
       $_post = $_POST;
     }
+    unset($_post[EpiForm::__FIELD__]);
 
     return base64_encode(json_encode($_post));
   }
@@ -147,8 +149,12 @@ class EpiFormServer
 
   private static function generateDefinitions()
   {
-    self::$definitions = json_decode($_REQUEST['__EpiForm__'], 1);
-    return self::$definitions;
+    if(empty(self::$definitions))
+    {
+      self::$definitions = json_decode($_REQUEST[EpiForm::__FIELD__], 1);
+    }
+
+    return (array) self::$definitions;
   }
 
   private static function _maxChars($val, $args)

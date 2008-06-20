@@ -5,6 +5,7 @@ YAHOO.formValidator = function()
   var debug= false;
   var defs = [];
   var elements = [];
+  var form = null;
 
   var addDef = function(aDef)
   {
@@ -62,8 +63,12 @@ YAHOO.formValidator = function()
     {
       debug= aArgs.debug;
       defs = aArgs.defs;
-      YAHOO.util.Event.onContentReady(aArgs.form, this.getElements, this, true);
-      YAHOO.util.Event.addListener(aArgs.form, "submit", this.validate, this, true);
+      form = YAHOO.util.Dom.get(aArgs.form);
+      YAHOO.util.Event.onDOMReady(function(){ 
+          this.getElements();
+          YAHOO.util.Event.addListener(form, "submit", this.validate, this, true);
+        }
+        , this, true);
     },
     
     addElement: function(aDef)
@@ -80,10 +85,11 @@ YAHOO.formValidator = function()
         if(!YAHOO.lang.isArray(aDef["event"]))
           aDef["event"] = [aDef["event"]];
 
+        info("field " + aDef['event'].toSource());
         for(var i=0; i<aDef["event"].length; i++)
         {
-          info("adding handler " + aDef["event"] + " for " + aDef.el);
-          YAHOO.util.Event.addListener(YAHOO.util.Dom.get(aDef.el), aDef["event"][i], this.validateField, this, true);
+          info("adding handler " + aDef["event"] + " for " + aDef.el + " validating " + aDef.type);
+          YAHOO.util.Event.addListener(form[aDef.el], aDef["event"][i], this.validateField, aDef, this);
         }
       }
     },
@@ -105,7 +111,11 @@ YAHOO.formValidator = function()
       {
         if(YAHOO.lang.hasOwnProperty(aElements, name))
         {
-          YAHOO.util.Dom.get(name).value = aElements[name];
+          el = YAHOO.util.Dom.get(name);
+          if(el)
+          {
+            el.value = aElements[name];
+          }
         }
       }
     },
@@ -117,7 +127,7 @@ YAHOO.formValidator = function()
       {
         if(YAHOO.lang.hasOwnProperty(defs, aEl))
         {
-          if(this.validateField(defs[aEl]))
+          if(this.validateField(e, defs[aEl]))
           {
             info("passed");
           }
@@ -135,22 +145,12 @@ YAHOO.formValidator = function()
       }
     },
     
-    validateField: function(arg)
+    validateField: function(e, aDef)
     {
-      if(YAHOO.lang.isUndefined(arg.el))
-      {
-        var el = YAHOO.util.Event.getTarget(arg)
-        aDef = elements[el.id];
-      }
-      else
-      {
-        aDef = arg;
-      }
-
       if(YAHOO.lang.isUndefined(aDef.args))
         aDef.args = {};
       
-      retval = rules[aDef.type](YAHOO.util.Dom.get(aDef.el), aDef.args);
+      retval = rules[aDef.type](form[aDef.el], aDef.args);
 
       if(retval)
       {

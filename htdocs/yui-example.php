@@ -12,8 +12,10 @@
   }
   $form = EpiForm::addForm('f');
   //$form->debug(true);
-  $form->addField('i')->addType('maxChars', 5)->addEvent('keyup')->addEvent('mouseup')->addMessage('Cannot be more then 5 chars');
-  $form->overloadPass('function(aDef){ alert(aDef.toSource()); }');
+  $form->addField('i')->addType('maxChars', 5)->addEvent('keyup')->addMessage('Cannot be more then 5 chars');
+  //$form->addField('i')->addType('maxChars', 5)->addMessage('Cannot be more then 5 chars');
+  $form->overloadFail('function(aDef){ YAHOO.util.Dom.setStyle(aDef.el+"-div", "background-color", "red"); YAHOO.util.Dom.get(aDef.el+"-msg").innerHTML=aDef.msg; }');
+  $form->overloadPass('function(aDef){ YAHOO.util.Dom.setStyle(aDef.el+"-div", "background-color", ""); YAHOO.util.Dom.get(aDef.el+"-msg").innerHTML=""; }');
 ?>
 <html>
   <head>
@@ -33,12 +35,15 @@
   </head>
 <body>
   <form id="f" method="post">
-    <input type="text" name="i" id="i" value="test" />
+    <div id="i-div" style="padding:10px; border:solid 1px #ccc;">
+      <input type="text" name="i" value="test" />
+      <div id="i-msg"></div>
+    </div>
     <input type="submit" value="submit" id="s" />
     <?php echo $form->prepareForServer(); ?>
   </form>
   <script>
-    <?php //echo $form->validateJS(); ?>
+    <?php echo $form->validateJS(); ?>
     <?php
       if(isset($_GET['__epi__']))
       {
