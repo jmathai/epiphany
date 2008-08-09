@@ -2,16 +2,25 @@
 /**
  * EpiCode master file
  *
- * This contains the EpiCode class as wel as the EpiError abstract class
+ * This contains the EpiCode class as wel as the EpiException abstract class
  * @author  Jaisen Mathai <jaisen@jmathai.com>
  * @version 1.0  
  * @package EpiCode
  */
 
-/**
- * Require included EpiError class which extends EpiAbstract
- */
-require_once dirname(__FILE__) . '/EpiError.php';
+// EPICODE_BASE is the full path to the directory that contains your core files (default :: ../)
+if(!defined('EPICODE_BASE'))
+{
+  define('EPICODE_BASE', dirname(dirname(__FILE__)));
+}
+
+// EPICODE_VIEWS is the full path to the directory that contains the views (default :: ./views)
+if(!defined('EPICODE_VIEWS'))
+{
+  define('EPICODE_VIEWS', EPICODE_BASE . '/views');
+}
+
+
 
 /**
  * This is the main EpiCode class.
@@ -19,7 +28,7 @@ require_once dirname(__FILE__) . '/EpiError.php';
  * @author  Jaisen Mathai <jaisen@jmathai.com>
  * @final
  */
-final class EpiCode
+class EpiCode
 {
   /**
    * EpiCode::display('/path/to/template.php', $array);
@@ -32,29 +41,52 @@ final class EpiCode
    */
   public static function display($template = null, $vars = null)
   {
-    try
+    $templateInclude = EPICODE_VIEWS . '/' . $template;
+    if(is_file($templateInclude))
     {
-      $templateInclude = EPICODE_VIEWS . '/' . $template;
-      if(is_file($templateInclude))
+      if(is_array($vars))
       {
-        if(is_array($vars))
-        {
-          extract($vars);
-        }
-        
-        include $templateInclude;
+        extract($vars);
       }
-      else
-      {
-        throw new EpiError(EpiError::EPI_ERROR_TEMPLATE);
-      }
+      
+      include $templateInclude;
     }
-    catch(EpiError $e)
+    else
     {
-      $e->handler();
+      throw new EpiException("Could not load template: {$templateInclude}", EpiException::EPI_EXCEPTION_TEMPLATE);
     }
   }
   
+  /**
+   * EpiCode::get('/path/to/template.php', $array);
+   * @name  get
+   * @author  Jaisen Mathai <jaisen@jmathai.com>
+   * @param string $template
+   * @param array $vars
+   * @method get
+   * @static method
+   */
+  public static function get($template = null, $vars = null)
+  {
+    $templateInclude = EPICODE_VIEWS . '/' . $template;
+    if(is_file($templateInclude))
+    {
+      if(is_array($vars))
+      {
+        extract($vars);
+      }
+      ob_start();
+      include $templateInclude;
+      $contents = ob_get_contents();
+      ob_end_clean();
+      return $contents;
+    }
+    else
+    {
+      throw new EpiException("Could not load template: {$templateInclude}", EpiException::EPI_EXCEPTION_TEMPLATE);
+    }
+  }
+
   /**
    * EpiCode::getRoute($_GET['__route__'], $_['routes']); 
    * @name  getRoute
@@ -68,27 +100,20 @@ final class EpiCode
   { 
     if($route != '.' && is_array($routes))
     {
-      $route = preg_replace('/\/$/', '', $route);
+      $route = preg_replace('/(\/|\?.*)$/', '', $route);
       
       if(isset($routes[$route]))
       {
         $arg1  = $routes[$route][0];
         $arg2  = $routes[$route][1];
 
-        try
+        if(method_exists($arg1, $arg2))
         {
-          if(method_exists($arg1, $arg2))
-          {
-            call_user_func(array($arg1, $arg2));
-          }
-          else
-          {
-            throw new EpiError(EpiError::EPI_ERROR_METHOD);
-          }
+          call_user_func(array($arg1, $arg2));
         }
-        catch(EpiError $e)
+        else
         {
-          $e->handler();
+          throw new EpiException("Could not call {$arg1}::{$arg2}", EpiException::EPI_EXCEPTION_METHOD);
         }
       }
       else
@@ -101,14 +126,7 @@ final class EpiCode
     }
     else
     {
-      try
-      {
-        throw new EpiError(EpiError::EPI_ERROR_ROUTE);
-      }
-      catch(EpiError $e)
-      {
-        $e->handler();
-      }
+      throw new EpiException("Could not find route {$route} from {$_SERVER['REQUEST_URI']}", EpiException::EPI_EXCEPTION_ROUTE);
     }
   }
   
@@ -124,20 +142,13 @@ final class EpiCode
    */
   public static function insert($template = null)
   {
-    try
+    if(file_exists($template))
     {
-      if(file_exists($template))
-      {
-        include $template;
-      }
-      else
-      {
-        throw new EpiError(EpiError::EPI_ERROR_INSERT);
-      }
+      include $template;
     }
-    catch(EpiError $e)
+    else
     {
-      $e->handler();
+      throw new EpiException("Could not insert {$template}", EpiException::EPI_EXCEPTION_INSERT);
     }
   }
   
@@ -152,20 +163,13 @@ final class EpiCode
    */
   public static function json($data)
   {
-    try
+    if($retval = json_encode($data))
     {
-      if($retval = json_encode($data))
-      {
-        return $retval;
-      }
-      else
-      {
-        throw new EpiError(EpiError::EPI_ERROR_JSON);
-      }
+      return $retval;
     }
-    catch(EpiError $e)
+    else
     {
-      $e->handler();
+      throw new EpiException("JSON encode failed", EpiException::EPI_EXCEPTION_JSON);
     }
   }
   
@@ -180,9 +184,10 @@ final class EpiCode
    */
   public static function jsonResponse($data)
   {
+    $json = self::json($data);
     header('X-JSON: (' . json_encode($data) . ')');
     header('Content-type: application/x-json');
-    echo self::json($data);
+    echo $json;
   }
   
   /**
@@ -195,21 +200,14 @@ final class EpiCode
    */
   public static function redirect($url = null)
   {
-    try
+    if($url != '')
     {
-      if($url != '')
-      {
-        header('Location: ' . $url);
-        die();
-      }
-      else
-      {
-        throw new EpiError(EpiError::EPI_ERROR_REDIRECT);
-      }
+      header('Location: ' . $url);
+      die();
     }
-    catch(EpiError $e)
+    else
     {
-      $e->handler();
+      throw new EpiException(EpiException::EPI_EXCEPTION_REDIRECT, "Redirect to {$url} failed");
     }
   }
   
@@ -231,154 +229,33 @@ final class EpiCode
 }
 
 /**
- * This is an abstract class which is extended in EpiError.php
- * @name EpiAbstract
  * @author Jaisen Mathai <jaisen@jmathai.com>
  * @uses Exception
- * @abstract class
  */
-abstract class EpiAbstract extends Exception
+class EpiException extends Exception
 {
-  /**
-   * @usedby EpiCode::getRoute
-   */
-  const EPI_ERROR_ROUTE     = 1;
-  
-  /**
-   * @usedby EpiCode::display
-   */
-  const EPI_ERROR_TEMPLATE  = 2;
+  const EPI_EXCEPTION_ROUTE     = 1;
+  const EPI_EXCEPTION_TEMPLATE  = 2;
+  const EPI_EXCEPTION_METHOD    = 3;
+  const EPI_EXCEPTION_FUNCTION  = 4;
+  const EPI_EXCEPTION_FILE      = 5;
+  const EPI_EXCEPTION_INSERT    = 6;
+  const EPI_EXCEPTION_JSON      = 7;
+  const EPI_EXCEPTION_REDIRECT  = 8;
 
-  /**
-   * @usedby EpiCode::getRoute
-   */
-  const EPI_ERROR_METHOD    = 3;
+  const EPI_EXCEPTION_DB_CONNECTION = 100;
+  const EPI_EXCEPTION_DB_QUERY = 101;
 
-  /**
-   * @usedby EpiCode::getRoute
-   */
-  const EPI_ERROR_FUNCTION  = 4;
-
-  /**
-   * @usedby EpiCode::getRoute
-   */
-  const EPI_ERROR_FILE      = 5;
-
-  /**
-   * @usedby EpiCode::getRoute
-   * @ignore
-   */
-  const EPI_ERROR_INSERT    = 6;
-
-  /**
-   * @usedby EpiCode::json
-   * @usedby EpiCode::jsonRequest
-   */
-  const EPI_ERROR_JSON      = 7;
-
-  /**
-   * @usedby EpiCode::redirect
-   */
-  const EPI_ERROR_REDIRECT  = 8;
-  
-  /**
-   * @ignore
-   */
-  public function __construct($code, $message = '')
+  public function __construct($message = '', $code = 0)
   {
-    parent::__construct($message, $code);
-  }
-
-  /**
-   * @ignore
-   */
-  public function handler()
-  {
-    switch($this->getCode())
+    if(function_exists('EpiExceptionHandler'))
     {
-      case self::EPI_ERROR_ROUTE:
-        $method = '_route';
-        break;
-      case self::EPI_ERROR_TEMPLATE:
-        $method = '_template';
-        break;
-      case self::EPI_ERROR_METHOD:
-        $method = '_method';
-        break;
-      case self::EPI_ERROR_FUNCTION:
-        $method = '_function';
-        break;
-      case self::EPI_ERROR_FILE:
-        $method = '_file';
-        break;
-      case self::EPI_ERROR_JSON:
-        $method = '_json';
-        break;
-      case self::EPI_ERROR_REDIRECT:
-        $method = '_json';
-        break;
+      EpiExceptionHandler($message, $code);
     }
-
-    if(isset($method))
+    else
     {
-      return call_user_func(array($this, $method));
+      parent::__construct($message, $code);
     }
   }
-  
-  /**
-   * Implement this method by defining an EpiError class in EpiError.php.
-   * @name _route
-   * @author  Jaisen Mathai <jaisen@jmathai.com>
-   * @method _route
-   */
-  abstract protected function _route();
-
-  /**
-   * Implement this method in EpiError.
-   * @name _template
-   * @author  Jaisen Mathai <jaisen@jmathai.com>
-   * @method _template
-   */
-  abstract protected function _template();
-
-  /**
-   * Implement this method in EpiError.
-   * @name _method
-   * @author  Jaisen Mathai <jaisen@jmathai.com>
-   * @method _method
-   */
-  abstract protected function _method();
-
-  /**
-   * Implement this method in EpiError.
-   * @name _function
-   * @author  Jaisen Mathai <jaisen@jmathai.com>
-   * @method _function
-   */
-  abstract protected function _function();
-
-  /**
-   * Implement this method in EpiError.
-   * @name _file
-   * @author  Jaisen Mathai <jaisen@jmathai.com>
-   * @method _file
-   */
-  abstract protected function _file();
-
-  /**
-   * Implement this method in EpiError.
-   * @name _json
-   * @author  Jaisen Mathai <jaisen@jmathai.com>
-   * @method _json
-   */
-  abstract protected function _json();
-
-  /**
-   * Implement this method in EpiError.
-   * @name _redirect
-   * @author  Jaisen Mathai <jaisen@jmathai.com>
-   * @method _redirect
-   */
-  abstract protected function _redirect();
 }
 ?>

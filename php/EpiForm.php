@@ -7,8 +7,11 @@ class EpiForm
   private $slot   = 0;
   private $currentField = -1;
   private $debug = false;
-  private $pass = null;
-  private $fail = null;
+  private $passField = null;
+  private $failField = null;
+  private $passForm = null;
+  private $failForm = null;
+  private $formParams = null;
   private $jsInit = null;
 
   public function __construct($id)
@@ -34,36 +37,43 @@ class EpiForm
     $this->fields[$this->currentField]['msg'] = $msg;
   }
 
-  public function addType($type, $params)
+  public function addType($type, $params = null)
   {
     call_user_func(array(__CLASS__, '_'.$type), $params);
     return $this;
   }
 
-  public function setDebug($bool)
-  {
-    $this->debug = (boolean)$bool;
-    return $this;
-  }
-
   public function getClientValidationJS()
   {
-    $retval = array();
-    $retval['defs'] = array();
+    $defs = array();
+    $defs['defs'] = array();
+    $defs['params'] = $this->formParams;
     foreach($this->fields as $i => $field)
     {
-      $retval['defs'][$i] = array('el' => $field['id'], 'type' => $field['type']['rule'], 'args' => $field['type']['args'], 'event' => $field['events'], 'msg' => $field['msg']);
+      $defs['defs'][$i] = array('el' => $field['id'], 'type' => $field['type']['rule'], 'args' => $field['type']['args'], 'listen' => $field['events'], 'msg' => $field['msg']);
     }
 
-    $retval = $this->_jsInit() . 'YAHOO.formValidator.initClientValidation(' . json_encode($retval) . ');';
-    if($this->pass)
+    $retval = $this->_jsInit() . ' Event.add(window, "load", function(){
+      YAHOO.formValidator.initClientValidation(' . json_encode($defs) . ');';
+
+    if($this->passField)
     {
-      $retval .= 'YAHOO.formValidator.pass = ' . trim($this->pass) . ';';
+      $retval .= 'YAHOO.formValidator.passFieldFunc = ' . trim($this->passField) . ";\n";
     }
-    if($this->fail)
+    if($this->passForm)
     {
-      $retval .= 'YAHOO.formValidator.fail = ' . trim($this->fail) . ';';
+      $retval .= 'YAHOO.formValidator.passFormFunc = ' . trim($this->passForm) . ";\n";
     }
+    if($this->failField)
+    {
+      $retval .= 'YAHOO.formValidator.failFieldFunc = ' . trim($this->failField) . ";\n";
+    }
+    if($this->failForm)
+    {
+      $retval .= 'YAHOO.formValidator.failFormFunc = ' . trim($this->failForm) . ";\n";
+    }
+
+    $retval .= '} );'; // close Event.add
 
     return $retval;
   }
@@ -76,18 +86,40 @@ class EpiForm
   public function getRepopulateJS($str)
   {
     $fields = EpiFormServer::getDecodedString($str);
-    return $this->_jsInit() . 'YAHOO.formValidator.repopulate(' . $fields . ');';
+    return $this->_jsInit() . 'Event.add(window, "load", function(){ YAHOO.formValidator.repopulate(' . $fields . '); } );';
   }
 
-  public function setPassFunction($js)
+  public function setDebug($bool)
   {
-    $this->pass = $js;
+    $this->debug = (boolean)$bool;
+    return $this;
   }
 
-  public function setFailFunction($js)
+  public function setFormParams($params)
   {
-    $this->fail = $js;
+    $this->formParams = $params;
   }
+
+  public function setPassFieldFunction($js)
+  {
+    $this->passField = $js;
+  }
+
+  public function setPassFormFunction($js)
+  {
+    $this->passForm = $js;
+  }
+
+  public function setFailFieldFunction($js)
+  {
+    $this->failField = $js;
+  }
+
+  public function setFailFormFunction($js)
+  {
+    $this->failForm = $js;
+  }
+
 
   private function _jsInit()
   {
@@ -96,15 +128,39 @@ class EpiForm
     {
       $args['form'] = $this->id;
       $args['debug']= $this->debug;
-      $retval = 'YAHOO.formValidator.init(' . json_encode($args) . ');';
+      $retval = '
+        Event.add(window, "load", function(){
+            YAHOO.formValidator.init(' . json_encode($args) . ');
+          }
+        );';
     }
 
     return $retval;
   }
 
+  private function _email($args)
+  {
+    $this->fields[$this->currentField]['type'] = array('rule' => 'email', 'args' => (string)$args);
+  }
+
   private function _maxChars($args)
   {
     $this->fields[$this->currentField]['type'] = array('rule' => 'maxChars', 'args' => (string)$args);
+  }
+
+  private function _required($args)
+  {
+    $this->fields[$this->currentField]['type'] = array('rule' => 'required', 'args' => (string)$args);
+  }
+
+  private function _sameAs($args)
+  {
+    $this->fields[$this->currentField]['type'] = array('rule' => 'sameAs', 'args' => (string)$args);
+  }
+  
+  private function _zip($args)
+  {
+    $this->fields[$this->currentField]['type'] = array('rule' => 'zip', 'args' => (string)$args);
   }
 }
 
@@ -127,17 +183,16 @@ class EpiFormServer
       $type = '_' . $def['type']['rule'];
       $args = $def['type']['args'];
 
-      if(self::$type($_REQUEST[$name], $args))
+      if(!self::$type($_REQUEST[$name], $args))
       {
         $retval += $slot;
       }
-
     }
 
     return $retval;
   }
 
-  public function getFieldsByError($result = 0)
+  public function getFieldsByError($errorCode = 0)
   {
     $retval = array();
     foreach($this->definitions as $field)
@@ -173,9 +228,29 @@ class EpiFormServer
     return (array) $this->definitions;
   }
 
+  private static function _email($val, $args)
+  {
+    return stristr($val, '@') !== false; //preg_match('/^[A-z0-9_\-]+\@(A-z0-9_-]+\.)+[A-z]{2,4}$/', $val) === false;
+  }
+
   private static function _maxChars($val, $args)
   {
-    return mb_strlen($val) > $args; // false if longer than $args
+    return mb_strlen($val) <= $args; // false if longer than $args
+  }
+
+  private static function _required($val)
+  {
+    return !empty($val); // false if $args is blank
+  }
+
+  private static function _sameAs($val, $args)
+  {
+    return $val == $_REQUEST[$args]; // false if not same as $args
+  }
+  
+  private static function _zip($val, $args)
+  {
+    return preg_match('/\d{5}/', $val); // false if not 5 ints
   }
 }
 ?>
