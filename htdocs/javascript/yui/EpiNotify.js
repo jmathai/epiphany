@@ -1,3 +1,10 @@
+/*
+ * Author: Jaisen Mathai <jaisen@jmathai.com>
+ * Notes:
+ *  This ia a work in progress and not yet considered complete (though it does work).
+ *  It is known not to work in Safari but works on Opera and Firefox on OSX.
+ */
+
 YAHOO.namespace('notify');
 YAHOO.notify = function(params)
 {

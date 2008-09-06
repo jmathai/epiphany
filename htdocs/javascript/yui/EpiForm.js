@@ -1,4 +1,4 @@
-YAHOO.widget.Logger.enableBrowserConsole();
+//YAHOO.widget.Logger.enableBrowserConsole();
 YAHOO.namespace("formValidator");
 YAHOO.formValidator = function()
 {
@@ -16,7 +16,7 @@ YAHOO.formValidator = function()
   {
     if(debug)
     {
-      console.info(msg);
+      //console.info(msg);
     }
   };
   
