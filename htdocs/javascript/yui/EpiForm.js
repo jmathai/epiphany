@@ -1,3 +1,36 @@
+/*
+ * Modification History:
+ *   06/19/2008 - JM
+ *    - Ported from prototype.js to YUI and added server-side validation.
+ *  01/15/2007 - JM
+ *    - Added mod10 function
+ *  03/08/2002 - JM
+ *    - Fixed bug associated with using in_array and replaced certain in_array w/ array_search
+ *  02/26/2002 - JM
+ *    - Converted from cfml to php
+ *  07/26/2001 - JM
+ *    - Added streamline feature so only needed validation is sent to browser.
+ *  06/30/2001 - JM
+ *    - Added variable name for function for more than one use on a page.
+ *  03/15/2001 - JM
+ *    - Added option to output debugging information.  Useful when the tag is throwing javascript errors.
+ *    - Added maxElementsToDisplay to keep alert box from becoming too large (vertically).
+ *  03/06/2001 - JM
+ *    - Added ability to validate for minimum and maximum checkboxes
+ *    - Added ability to validate using regular expressions
+ *  03/05/2001 - JM
+ *    - Added minimumlength, maximumlength, and exact length
+ *    - Modified theseFields to replace single quotes with "\'"
+ *  02/23/2001 - JM
+ *    - Added ability to validate against selection lists
+ *  02/20/2001 - JM
+ *    - Added ability to accept field names in addition to field numbers
+ *    - Modified javascript variable to be assigned form object instead of name/number of form
+ *  02/16/2001 - JM
+ *    - Added minimumdate and maximumdate validation types
+ *  02/15/2001 - JM
+ *    - Added minimumnumber and maximumnumber validation types
+*/
 //YAHOO.widget.Logger.enableBrowserConsole();
 YAHOO.namespace("formValidator");
 YAHOO.formValidator = function()
