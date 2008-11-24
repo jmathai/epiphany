@@ -33,9 +33,14 @@ class EpiCurl
     $this->requests[$key] = $ch;
 
     $res = curl_multi_add_handle($this->mc, $ch);
-    if($res == 0)
+    
+    // (1)
+    if($res === CURLM_OK || $res === CURLM_CALL_MULTI_PERFORM)
     {
-      curl_multi_exec($this->mc, $active);
+      do {
+          $mrc = curl_multi_exec($this->mc, $active);
+      } while ($mrc === CURLM_CALL_MULTI_PERFORM);
+
       return new EpiCurlManager($key);
     }
     else
@@ -115,4 +120,9 @@ class EpiCurlManager
     return $responses[$name];
   }
 }
+
+/*
+ * Credits:
+ *  - (1) Alistair pointed out that curl_multi_add_handle can return CURLM_CALL_MULTI_PERFORM on success.
+ */
 ?>

@@ -16,23 +16,29 @@ class EpiCache_Memcached extends EpiCache
 
   public function get($key)
   {
-    if(!$this->connect() || empty($key)){
+    if(!$this->connect() || empty($key))
+    {
       return null;
-    }else if($getEpiCache = $this->getEpiCache($key)){
+    }
+    else if($getEpiCache = $this->getEpiCache($key))
+    {
       return $getEpiCache;
-    }else{
+    }
+    else
+    {
       $value = $this->memcached->get($key);
       $this->setEpiCache($key, $value);
       return $value;
     }
   }
 
-  public function set($key = null, $value = null)
+  public function set($key = null, $value = null, $ttl = null)
   {
     if(!$this->connect() || empty($key) || $value === null)
       return false;
 
-    $this->memcached->set($key, $value, $this->compress, $this->expiry);
+    $expiry = $ttl === null ? $this->expiry : $ttl;
+    $this->memcached->set($key, $value, $this->compress, $expiry);
     $this->setEpiCache($key, $value);
     return true;
   }
@@ -43,9 +49,7 @@ class EpiCache_Memcached extends EpiCache
     {
       $this->memcached = new Memcache;
       if($this->memcached->connect($this->host, $this->port))
-      {
         return true;
-      }
     }
 
     return false;

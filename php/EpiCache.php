@@ -1,7 +1,8 @@
 <?php
 class EpiCache
 {
-  const MEMCACHED = 'EpiCache_Memcached';
+  const EPICACHE_MEMCACHED = 'EpiCache_Memcached';
+  const EPICACHE_APC = 'EpiCache_Apc';
   private static $instances;
   private $cached;
   private $hash;
@@ -21,25 +22,17 @@ class EpiCache
     $type = array_shift($params);
     switch($type)
     {
-      case self::MEMCACHED:
-        require_once PATH_MODEL . '/' . self::MEMCACHED . '.php';
+      case self::EPICACHE_MEMCACHED:
+        require_once PATH_MODEL . '/' . self::EPICACHE_MEMCACHED . '.php';
         self::$instances[$hash] = new EpiCache_Memcached($params[0], $params[1]);
         self::$instances[$hash]->hash = $hash;
         return self::$instances[$hash];
+      case self::EPICACHE_APC:
+        require_once PATH_MODEL . '/' . self::EPICACHE_APC . '.php';
+        self::$instances[$hash] = new EpiCache_Apc();
+        self::$instances[$hash]->hash = $hash;
+        return self::$instances[$hash];
     }
-  }
-
-  public function getByKey()
-  {
-    $params = func_get_args();
-    return $this->get(implode('.', $params));
-  }
-
-  public function setByKey()
-  {
-    $params = func_get_args();
-    $value  = array_pop($params);
-    return $this->set(implode('.', $params), $value);
   }
 
   protected function getEpiCache($key)
