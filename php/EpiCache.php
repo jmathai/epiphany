@@ -41,6 +41,20 @@ class EpiCache
   {
     $this->cached[$this->hash][$key] = $value;
   }
+
+  protected function getByKey()
+  {
+    $params = func_get_args();
+    return $this->get(implode('.', $params));
+  }
+ 
+  protected function setByKey()
+  {
+    $params = func_get_args();
+    $value = array_pop($params);
+    return $this->set(implode('.', $params), $value);
+  }
+  
 }
 
 if(!class_exists('EpiException')){
