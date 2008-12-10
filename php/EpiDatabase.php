@@ -161,6 +161,10 @@ class EpiDatabase
   }
 }
 
+if(!class_exists('EpiException')){
+  class EpiException extends Exception{}
+}
+
 class EpiDatabaseException extends EpiException{}
 class EpiDatabaseConnectionException extends EpiDatabaseException{}
 class EpiDatabaseQueryException extends EpiDatabaseException{}

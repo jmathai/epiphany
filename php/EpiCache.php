@@ -43,6 +43,10 @@ class EpiCache
   }
 }
 
+if(!class_exists('EpiException')){
+  class EpiException extends Exception{}
+}
+
 class EpiCacheException extends EpiException{}
 class EpiCacheTypeDoesNotExistException extends EpiCacheException{}
 ?>

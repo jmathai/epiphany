@@ -1,3 +1,6 @@
+1.2
+	Fixed exception dependency
+		* Defining EpiException if not already defined in EpiCache and EpiDatabase
 1.1
 	Updated EpiCache
 		* IMPORTANT: Backwards compatibility broken because class constants changed
