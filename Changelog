@@ -1,0 +1,6 @@
+1.1
+	Updated EpiCache
+		* IMPORTANT: Backwards compatibility broken because class constants changed
+		* Incorporated changes from Andrew Wagner to simplify EpiCache factory function
+1.0
+	Initial checkin

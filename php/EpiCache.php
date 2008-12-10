@@ -1,8 +1,8 @@
 <?php
 class EpiCache
 {
-  const EPICACHE_MEMCACHED = 'EpiCache_Memcached';
-  const EPICACHE_APC = 'EpiCache_Apc';
+  const MEMCACHED = 'EpiCache_Memcached';
+  const APC = 'EpiCache_Apc';
   private static $instances;
   private $cached;
   private $hash;
@@ -20,19 +20,13 @@ class EpiCache
       return self::$instances[$hash];
 
     $type = array_shift($params);
-    switch($type)
-    {
-      case self::EPICACHE_MEMCACHED:
-        require_once PATH_MODEL . '/' . self::EPICACHE_MEMCACHED . '.php';
-        self::$instances[$hash] = new EpiCache_Memcached($params[0], $params[1]);
-        self::$instances[$hash]->hash = $hash;
-        return self::$instances[$hash];
-      case self::EPICACHE_APC:
-        require_once PATH_MODEL . '/' . self::EPICACHE_APC . '.php';
-        self::$instances[$hash] = new EpiCache_Apc();
-        self::$instances[$hash]->hash = $hash;
-        return self::$instances[$hash];
-    }
+    if(!file_exists($file = dirname(__FILE__) . "/{$type}.php"))
+      throw new EpiCacheTypeDoesNotExistException("EpiCache type does not exist: ({$type}).  Tried loading {$file}", 404);
+
+    require_once $file;
+    self::$instances[$hash] = new $type($params);
+    self::$instances[$hash]->hash = $hash;
+    return self::$instances[$hash];
   }
 
   protected function getEpiCache($key)
@@ -48,4 +42,7 @@ class EpiCache
     $this->cached[$this->hash][$key] = $value;
   }
 }
+
+class EpiCacheException extends EpiException{}
+class EpiCacheTypeDoesNotExistException extends EpiCacheException{}
 ?>

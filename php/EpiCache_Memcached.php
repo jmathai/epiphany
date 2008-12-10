@@ -6,12 +6,12 @@ class EpiCache_Memcached extends EpiCache
   private $port = null;
   private $compress = null;
   private $expiry   = null;
-  public function __construct($host, $port, $compress = 0, $expiry = 3600)
+  public function __construct($params = array())
   {
-    $this->host = $host;
-    $this->port = $port;
-    $this->compress = $compress;
-    $this->expiry   = $expiry;
+    $this->host = !empty($params[0] ? $params[0] : 'localhost';
+    $this->port = !empty($params[1] ? $params[1] : 11211;;
+    $this->compress = !empty($params[2] ? $params[2] : 0;;
+    $this->expiry   = !empty($params[3] ? $params[3] : 3600;
   }
 
   public function get($key)

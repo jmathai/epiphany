@@ -2,9 +2,9 @@
 class EpiCache_Apc extends EpiCache
 {
   private $expiry   = null;
-  public function __construct($expiry = 3600)
+  public function __construct($params = array())
   {
-    $this->expiry   = $expiry;
+    $this->expiry   = !empty($params[0]) ? $params[0] : 3600;
   }
 
   public function get($key)
