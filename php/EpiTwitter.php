@@ -4,19 +4,18 @@ class EpiTwitter extends EpiOAuth
   protected $requestTokenUrl = 'http://twitter.com/oauth/request_token';
   protected $accessTokenUrl = 'http://twitter.com/oauth/access_token';
   protected $authorizeUrl = 'http://twitter.com/oauth/authorize';
-  protected $apiUrl = 'http://twitter.com/oauth/authorize';
+  protected $apiUrl = 'http://twitter.com';
 
-  public function getUserInfo()
+  public function __call($name, $params = null)
   {
-    return new EpiTwitterJson($this->httpRequest('POST', 'http://twitter.com/account/verify_credentials.json'));
-  }
+    $parts  = explode('_', $name);
+    $method = strtoupper(array_shift($parts));
+    $parts  = implode('_', $parts);
+    $url    = $this->apiUrl . '/' . preg_replace('/[A-Z]/e', "'/'.strtolower('\\0')", $parts) . '.json';
+    if(!empty($params))
+      $args = array_shift($params);
 
-  public function setUserStatus($status = null/*, $in_reply_to_status_id = null*/)
-  {
-    if(empty($status) || strlen($status) > 140)
-      return false;
-
-    return new EpiTwitterJson($this->httpRequest('POST', 'http://twitter.com/statuses/update.json', array('status' => $status)));
+    return new EpiTwitterJson(call_user_func(array($this, 'httpRequest'), $method, $url, $args));
   }
 
   public function __construct($consumerKey = null, $consumerSecret = null, $oauthToken = null, $oauthTokenSecret = null)
@@ -40,17 +39,13 @@ class EpiTwitterJson
 
   public function __get($name)
   {
-    var_dump($this->resp->data);
-    if($this->resp->code < 200 || $this->resp->code > 299)
-      return false;
-
-    $result = json_decode($this->resp->data, 1);
-    foreach($result as $k => $v)
+    $this->responseText = $this->resp->data;
+    $this->response = json_decode($this->responseText, 1);
+    foreach($this->response as $k => $v)
     {
       $this->$k = $v;
     }
 
-    return $result[$name];
+    return $this->$name;
   }
 }
-?>

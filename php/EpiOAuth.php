@@ -14,30 +14,21 @@ class EpiOAuth
 
   public function getAccessToken()
   {
-    $resp = $this->httpRequest('POST', $this->accessTokenUrl);
+    $resp = $this->httpRequest('GET', $this->accessTokenUrl);
     return new EpiOAuthResponse($resp);
   }
 
-  public function getAuthorizationLink()
+  public function getAuthorizationUrl()
   { 
     $retval = "{$this->authorizeUrl}?";
 
     $token = $this->getRequestToken();
-    $this->setToken($token->oauth_token, $token->oauth_token_secret);
-    $params = $this->prepareParameters('GET', $this->authorizeUrl);
-    foreach($params as $k => $v)
-    {
-      $v = $this->encode($v);
-      $retval .= "{$k}={$v}&";
-    }
-    $retval = substr($retval, 0, -1);
-
-    return $retval;
+    return $this->authorizeUrl . '?oauth_token=' . $token->oauth_token;
   }
 
   public function getRequestToken()
   {
-    $resp = $this->httpRequest('POST', $this->requestTokenUrl);
+    $resp = $this->httpRequest('GET', $this->requestTokenUrl);
     return new EpiOAuthResponse($resp);
   }
 
@@ -46,34 +37,18 @@ class EpiOAuth
     if(empty($method) || empty($url))
       return false;
 
-    if($method === 'GET' && count($params) > 0)
-    {
-      $url .= '?';
-      foreach($params as $k => $v)
-      {
-        $url .= "{$k}={$v}&";
-      }
-      $url = substr($url, 0, -1);
-    }
-    
     if(empty($params['oauth_signature']))
       $params = $this->prepareParameters($method, $url, $params);
 
-    $ch = curl_init($url);
     switch($method)
     {
+      case 'GET':
+        return $this->httpGet($url, $params);
+        break;
       case 'POST':
-        curl_setopt($ch, CURLOPT_POST, true);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, $params);
+        return $this->httpPost($url, $params);
         break;
     }
-
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    curl_setopt($ch, CURLOPT_HTTPHEADER, array('Expect:')); 
-    //curl_setopt($ch, CURLOPT_HEADER, true); 
-    $resp  = $this->curl->addCurl($ch);
-
-    return $resp;
   }
 
   final public function setToken($token = null, $secret = null)
@@ -115,6 +90,37 @@ class EpiOAuth
     $signatureBaseString = "{$method}&{$normalizedUrl}&{$concatenatedParams}";
     
     return $this->signString($signatureBaseString);
+  }
+
+  final private function httpGet($url, $params = null)
+  {
+    if(count($params) > 0)
+    {
+      $url .= '?';
+      foreach($params as $k => $v)
+      {
+        $url .= "{$k}={$v}&";
+      }
+      $url = substr($url, 0, -1);
+    }
+    $ch = curl_init($url);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_HTTPHEADER, array('Expect:')); 
+    $resp  = $this->curl->addCurl($ch);
+
+    return $resp;
+  }
+
+  final private function httpPost($url, $params = null)
+  {
+    $ch = curl_init($url);
+    curl_setopt($ch, CURLOPT_POST, true);
+    curl_setopt($ch, CURLOPT_POSTFIELDS, $params);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_HTTPHEADER, array('Expect:')); 
+    $resp  = $this->curl->addCurl($ch);
+
+    return $resp;
   }
 
   final private function normalizeUrl($url = null)
@@ -165,7 +171,6 @@ class EpiOAuth
 
     // signing
     $encodedParams['oauth_signature'] = $this->generateSignature($method, $url, $encodedParams);
-
     return $encodedParams;
   }
 
@@ -176,7 +181,7 @@ class EpiOAuth
     {
       case 'HMAC-SHA1':
         $key = $this->encode($this->consumerSecret) . '&' . $this->encode($this->tokenSecret);
-        $retval = base64_encode(hash_hmac('sha1', $string, $key, true));
+        $retval = $this->encode(base64_encode(hash_hmac('sha1', $string, $key, true)));
         break;
     }
 
@@ -191,19 +196,19 @@ class EpiOAuth
 
 class EpiOAuthResponse
 {
-  private $resp;
+  private $__resp;
 
   public function __construct($resp)
   {
-    $this->resp = $resp;
+    $this->__resp = $resp;
   }
 
   public function __get($name)
   {
-    if($this->resp->code < 200 || $this->resp->code > 299)
+    if($this->__resp->code < 200 || $this->__resp->code > 299)
       return false;
 
-    parse_str($this->resp->data, $result);
+    parse_str($this->__resp->data, $result);
     foreach($result as $k => $v)
     {
       $this->$k = $v;
@@ -212,4 +217,3 @@ class EpiOAuthResponse
     return $result[$name];
   }
 }
-?>
