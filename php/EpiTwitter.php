@@ -11,7 +11,7 @@ class EpiTwitter extends EpiOAuth
     $parts  = explode('_', $name);
     $method = strtoupper(array_shift($parts));
     $parts  = implode('_', $parts);
-    $url    = $this->apiUrl . '/' . preg_replace('/[A-Z]/e', "'/'.strtolower('\\0')", $parts) . '.json';
+    $url    = $this->apiUrl . '/' . preg_replace('/[A-Z]|[0-9]+/e', "'/'.strtolower('\\0')", $parts) . '.json';
     if(!empty($params))
       $args = array_shift($params);
 
