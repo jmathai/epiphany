@@ -1,3 +1,6 @@
+1.5
+  Adding support for all twitter api endpoints to EpiTwitter & fixing an EpiOAuth bug
+    * EpiOAuth::getAuthorizationLink was renamed to EpiOAuth::getAuthorizationUrl
 1.4
   Adding EpiTwitter and EpiOAuth
     * EpiOAuth is a general OAuth class.  EpiTwitter extends it.  Both are considered beta and are expected to change.
