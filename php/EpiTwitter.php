@@ -1,6 +1,7 @@
 <?php
 class EpiTwitter extends EpiOAuth
 {
+  const EPITWITTER_SIGNATURE_METHOD = 'HMAC-SHA1';
   protected $requestTokenUrl = 'http://twitter.com/oauth/request_token';
   protected $accessTokenUrl = 'http://twitter.com/oauth/access_token';
   protected $authorizeUrl = 'http://twitter.com/oauth/authorize';
@@ -20,11 +21,8 @@ class EpiTwitter extends EpiOAuth
 
   public function __construct($consumerKey = null, $consumerSecret = null, $oauthToken = null, $oauthTokenSecret = null)
   {
-    $this->consumerKey = $consumerKey;
-    $this->consumerSecret = $consumerSecret;
-    $this->signatureMethod = 'HMAC-SHA1';
+    parent::__construct($consumerKey, $consumerSecret, self::EPITWITTER_SIGNATURE_METHOD);
     $this->setToken($oauthToken, $oauthTokenSecret);
-    parent::__construct();
   }
 }
 
@@ -40,7 +38,7 @@ class EpiTwitterJson
   public function __get($name)
   {
     $this->responseText = $this->resp->data;
-    $this->response = json_decode($this->responseText, 1);
+    $this->response = (array)json_decode($this->responseText, 1);
     foreach($this->response as $k => $v)
     {
       $this->$k = $v;

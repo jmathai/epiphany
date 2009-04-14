@@ -51,24 +51,40 @@ class EpiOAuth
     }
   }
 
-  final public function setToken($token = null, $secret = null)
+  public function setToken($token = null, $secret = null)
   {
     $params = func_get_args();
     $this->token = $token;
     $this->tokenSecret = $secret;
   } 
 
-  final public function encode($string)
+  public function encode($string)
   {
     return rawurlencode(utf8_encode($string));
   }
 
-  final private function generateNonce()
+  protected function addOAuthHeaders(&$ch, $url, $oauthHeaders)
   {
+    $_h = array('Expect:');
+    $oauth = 'Authorization: OAuth realm="' . str_replace($this->apiUrl, '', $url).'",';
+    foreach($oauthHeaders as $name => $value)
+    {
+      $oauth .= "{$name}=\"{$value}\",";
+    }
+    $_h[] = substr($oauth, 0, -1);
+  
+    curl_setopt($ch, CURLOPT_HTTPHEADER, $_h); 
+  }
+
+  protected function generateNonce()
+  {
+    if(isset($this->nonce)) // for unit testing
+      return $this->nonce;
+
     return md5(uniqid(rand(), true));
   }
 
-  final private function generateSignature($method = null, $url = null, $params = null)
+  protected function generateSignature($method = null, $url = null, $params = null)
   {
     if(empty($method) || empty($url))
       return false;
@@ -88,42 +104,40 @@ class EpiOAuth
     $method = $this->encode($method); // don't need this but why not?
 
     $signatureBaseString = "{$method}&{$normalizedUrl}&{$concatenatedParams}";
-    
     return $this->signString($signatureBaseString);
   }
 
-  final private function httpGet($url, $params = null)
+  protected function httpGet($url, $params = null)
   {
-    if(count($params) > 0)
+    if(count($params['request']) > 0)
     {
       $url .= '?';
-      foreach($params as $k => $v)
+      foreach($params['request'] as $k => $v)
       {
         $url .= "{$k}={$v}&";
       }
       $url = substr($url, 0, -1);
     }
     $ch = curl_init($url);
+    $this->addOAuthHeaders($ch, $url, $params['oauth']);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    curl_setopt($ch, CURLOPT_HTTPHEADER, array('Expect:')); 
     $resp  = $this->curl->addCurl($ch);
 
     return $resp;
   }
 
-  final private function httpPost($url, $params = null)
+  protected function httpPost($url, $params = null)
   {
     $ch = curl_init($url);
-    curl_setopt($ch, CURLOPT_POST, true);
-    curl_setopt($ch, CURLOPT_POSTFIELDS, $params);
+    $this->addOAuthHeaders($ch, $url, $params['oauth']);
+    curl_setopt($ch, CURLOPT_POST, 1);
+    curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($params['request']));
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    curl_setopt($ch, CURLOPT_HTTPHEADER, array('Expect:')); 
     $resp  = $this->curl->addCurl($ch);
-
     return $resp;
   }
 
-  final private function normalizeUrl($url = null)
+  protected function normalizeUrl($url = null)
   {
     $urlParts = parse_url($url);
     $scheme = strtolower($urlParts['scheme']);
@@ -144,52 +158,51 @@ class EpiOAuth
     return $retval;
   }
 
-  final public function prepareParameters($method = null, $url = null, $params = null)
+  protected function prepareParameters($method = null, $url = null, $params = null)
   {
     if(empty($method) || empty($url))
       return false;
 
-    $params['oauth_consumer_key'] = $this->consumerKey;
-    $params['oauth_token'] = $this->token;
-    $params['oauth_nonce'] = $this->generateNonce();
-    $params['oauth_timestamp'] = time();;
-    $params['oauth_signature_method'] = $this->signatureMethod;
-    $params['oauth_version'] = $this->version;
+    $oauth['oauth_consumer_key'] = $this->consumerKey;
+    $oauth['oauth_token'] = $this->token;
+    $oauth['oauth_nonce'] = $this->generateNonce();
+    $oauth['oauth_timestamp'] = !isset($this->timestamp) ? time() : $this->timestamp; // for unit test
+    $oauth['oauth_signature_method'] = $this->signatureMethod;
+    $oauth['oauth_version'] = $this->version;
 
     // encoding
-    $encodedParams = array();
-    foreach($params as $k => $v)
-    {
-      if(strstr($k, 'oauth_'))
-        $encodedParams[$this->encode($k)] = $this->encode($v);
-      else
-        $encodedParams[$this->encode($k)] = utf8_encode($v);
-    }
+    array_walk($oauth, array($this, 'encode'));
+    if(is_array($params))
+      array_walk($params, array($this, 'encode'));
+    $encodedParams = array_merge($oauth, (array)$params);
 
     // sorting
     ksort($encodedParams);
 
     // signing
-    $encodedParams['oauth_signature'] = $this->generateSignature($method, $url, $encodedParams);
-    return $encodedParams;
+    $oauth['oauth_signature'] = $this->encode($this->generateSignature($method, $url, $encodedParams));
+    return array('request' => $params, 'oauth' => $oauth);
   }
 
-  final private function signString($string = null)
+  protected function signString($string = null)
   {
     $retval = false;
     switch($this->signatureMethod)
     {
       case 'HMAC-SHA1':
         $key = $this->encode($this->consumerSecret) . '&' . $this->encode($this->tokenSecret);
-        $retval = $this->encode(base64_encode(hash_hmac('sha1', $string, $key, true)));
+        $retval = base64_encode(hash_hmac('sha1', $string, $key, true));
         break;
     }
 
     return $retval;
   }
 
-  public function __construct()
+  public function __construct($consumerKey, $consumerSecret, $signatureMethod='HMAC-SHA1')
   {
+    $this->consumerKey = $consumerKey;
+    $this->consumerSecret = $consumerSecret;
+    $this->signatureMethod = $signatureMethod;
     $this->curl = EpiCurl::getInstance();
   }
 }

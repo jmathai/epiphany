@@ -1,3 +1,6 @@
+1.6
+  Fixed bug related to POST requests and invalid encoding of the signature
+    * See http://code.google.com/p/twitter-api/issues/detail?id=447 for more information
 1.5
   Adding support for all twitter api endpoints to EpiTwitter & fixing an EpiOAuth bug
     * EpiOAuth::getAuthorizationLink was renamed to EpiOAuth::getAuthorizationUrl
