@@ -1,3 +1,6 @@
+1.7
+  Fixing a bug with GET requests that include parameters.
+    * The oauth realm included the query string
 1.6
   Fixed bug related to POST requests and invalid encoding of the signature
     * See http://code.google.com/p/twitter-api/issues/detail?id=447 for more information
