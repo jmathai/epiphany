@@ -26,18 +26,12 @@ class EpiTwitter extends EpiOAuth
   }
 }
 
-class EpiTwitterJson
+class EpiTwitterJson implements ArrayAccess, Countable,  IteratorAggregate
 {
   private $__resp;
   public function __construct($response)
   {
     $this->__resp = $response;
-  }
-
-  public function isValid ()
-  {
-    if($this->httpResponse->code < 200 || $this->httpResponse->code > 299)
-      return false;
   }
 
   // Implementation of the IteratorAggregate::getIterator() to support foreach ($this as $...)
