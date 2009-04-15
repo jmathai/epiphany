@@ -66,7 +66,8 @@ class EpiOAuth
   protected function addOAuthHeaders(&$ch, $url, $oauthHeaders)
   {
     $_h = array('Expect:');
-    $oauth = 'Authorization: OAuth realm="' . str_replace($this->apiUrl, '', $url).'",';
+    $urlParts = parse_url($url);
+    $oauth = 'Authorization: OAuth realm="' . $urlParts['path'] . '",';
     foreach($oauthHeaders as $name => $value)
     {
       $oauth .= "{$name}=\"{$value}\",";

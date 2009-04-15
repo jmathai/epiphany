@@ -27,7 +27,13 @@ class EpiTwitterTest extends PHPUnit_Framework_TestCase
     $this->assertTrue(!empty($screen_name), 'member property screen_name is empty');
   }
 
-  function testPostStatus()
+  function testGetWithParameters()
+  {
+    $resp = $this->twitterObj->get_statusesFriends_timeline(array('since_id' => 1));
+    $this->assertTrue(!empty($resp->response[0]['user']['screen_name']), 'first status has no screen name');
+  }
+
+  function testPostWithParameters()
   {
     $statusText = 'Testing a random status (' . time() . ')';
     $resp = $this->twitterObj->post_statusesUpdate(array('status' => $statusText));
