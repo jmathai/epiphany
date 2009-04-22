@@ -40,4 +40,19 @@ class EpiTwitterTest extends PHPUnit_Framework_TestCase
     $newStatus = $resp->response['text'];
     $this->assertEquals($newStatus, $statusText, 'The status was not updated correctly');
   }
+
+  function testSearch()
+  {
+    $resp = $this->twitterObj->get_search(array('q' => 'hello'));
+    $this->assertTrue(!empty($resp->response['results']));
+  }
+
+  function testTrends()
+  {
+    $resp = $this->twitterObj->get_trends();
+    $this->assertTrue(!empty($resp->response['trends']));
+
+    $resp = $this->twitterObj->get_trendsCurrent();
+    $this->assertTrue(!empty($resp->response['trends']));
+  }
 }

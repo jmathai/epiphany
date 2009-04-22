@@ -1,10 +1,18 @@
 h1. EpiCode Documentation
 
+
 *EpiCode* is an MVC framework that's better thought of as a toolset.  Every tool is completely decoupled so they can be used independently or in conjunction.  The toolset consists of the following:
-* [[EpiCode]]
+* "EpiCode":http://wiki.github.com/jmathai/epicode/epicode
+* "EpiTwitter":http://wiki.github.com/jmathai/epicode/epitwitter
+
+Documentation for the following is coming soon:
+* EpiForm
 * EpiForm
 * EpiDatabase
 * EpiCache
 * EpiCurl
 * EpiOAuth
-* [[EpiTwitter]]
+* EpiDatabase
+* EpiCache
+* EpiCurl
+* EpiOAuth
