@@ -4,10 +4,6 @@ h2. What's EpiCode?
 
 EpiCode started off as an MVC framework but has evolved into a set of extremely useful tools.  Every tool is completely decoupled so they can be used independently or in conjunction.  Each library in EpiCode is thought out and implemented in an extremely cohesive manner.
 
-h2. Authors
-
-Jaisen Mathai is the primary author of EpiCode.  Thanks to github, others have began to contribute as well.  Check the revision history to see everyone who's contributed.
-
 h2. Documentation
 
 The toolset consists of the following:
