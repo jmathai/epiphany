@@ -24,6 +24,7 @@ class EpiTwitter extends EpiOAuth
       $url = "{$this->searchUrl}{$path}?{$query}";
       $ch = curl_init($url);
       curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+echo $url;
 
       return new EpiTwitterJson(EpiCurl::getInstance()->addCurl($ch));
     }
@@ -38,20 +39,57 @@ class EpiTwitter extends EpiOAuth
   }
 }
 
-class EpiTwitterJson
+class EpiTwitterJson implements ArrayAccess, Countable,  IteratorAggregate
 {
-  private $resp;
-
-  public function __construct($resp)
+  private $__resp;
+  public function __construct($response)
   {
-    $this->resp = $resp;
+    $this->__resp = $response;
+  }
+
+  // Implementation of the IteratorAggregate::getIterator() to support foreach ($this as $...)
+  public function getIterator ()
+  {
+    return new ArrayIterator($this->response);
+  }
+
+  // Implementation of Countable::count() to support count($this)
+  public function count ()
+  {
+    return count($this->response);
+  }
+  
+  // Next four functions are to support ArrayAccess interface
+  // 1
+  public function offsetSet($offset, $value) 
+  {
+    $this->response[$offset] = $value;
+  }
+
+  // 2
+  public function offsetExists($offset) 
+  {
+    return isset($this->response[$offset]);
+  }
+  
+  // 3
+  public function offsetUnset($offset) 
+  {
+    unset($this->response[$offset]);
+  }
+
+  // 4
+  public function offsetGet($offset) 
+  {
+    return isset($this->response[$offset]) ? $this->response[$offset] : null;
   }
 
   public function __get($name)
   {
-    $this->responseText = $this->resp->data;
-    $this->response = (array)json_decode($this->responseText, 1);
-    foreach($this->response as $k => $v)
+    $this->responseText = $this->__resp->data;
+    $this->response     = json_decode($this->responseText, 1);
+    $this->obj          = json_decode($this->responseText);
+    foreach($this->obj as $k => $v)
     {
       $this->$k = $v;
     }
