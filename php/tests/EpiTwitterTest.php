@@ -14,6 +14,7 @@ class EpiTwitterTest extends PHPUnit_Framework_TestCase
     $token = '25451974-uakRmTZxrSFQbkDjZnTAsxDO5o9kacz2LT6kqEHA';
     $secret= 'CuQPQ1WqIdSJDTIkDUlXjHpbcRao9lcKhQHflqGE8';
     $this->twitterObj = new EpiTwitter($consumer_key, $consumer_secret, $token, $secret);
+    $this->screenName = 'jmathai_test';
   }
 
   function testGetVerifyCredentials()
@@ -39,6 +40,19 @@ class EpiTwitterTest extends PHPUnit_Framework_TestCase
     $resp = $this->twitterObj->post_statusesUpdate(array('status' => $statusText));
     $newStatus = $resp->response['text'];
     $this->assertEquals($newStatus, $statusText, 'The status was not updated correctly');
+  }
+
+  function testDirectMessage()
+  {
+    $resp = $this->twitterObj->post_direct_messagesNew( array ( 'user' => $this->screenName, 'text' => "@username that's dirt cheap man, good looking out. I shall buy soon.You still play Halo at all?"));
+    $this->assertTrue(!empty($resp->response['id']), "response id is empty");
+  }
+
+  function testNoRequiredParameter()
+  {
+    $resp = $this->twitterObj->post_direct_messagesNew( array ( 'user' => $this->screenName, 'text' => ""));
+    $this->assertTrue(!empty($resp->response['error']), "An empty direct message should return an error message");
+
   }
 
   function testSearch()
