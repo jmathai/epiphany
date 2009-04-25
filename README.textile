@@ -1,10 +1,20 @@
 h1. EpiCode Documentation
 
+h2. What's EpiCode?
+<p>
+EpiCode started off as an MVC framework but has evolved into a set of extremely useful tools.  Every tool is completely decoupled so they can be used independently or in conjunction.  Each library in EpiCode is thought out and implemented in an extremely cohesive manner.i
+</p>
 
-*EpiCode* is an MVC framework that's better thought of as a toolset.  Every tool is completely decoupled so they can be used independently or in conjunction.  The toolset consists of the following:
+h2. Authors
+Jaisen Mathai is the primary author of EpiCode.  Thanks to github, others have began to contribute as well.  Check the revision history to see everyone who's contributed.
+<p>
+
+h2. Documentation
+The toolset consists of the following:
 * "EpiCode":http://wiki.github.com/jmathai/epicode/epicode
 * "EpiTwitter":http://wiki.github.com/jmathai/epicode/epitwitter
-
+</p>
+<p>
 Documentation for the following is coming soon:
 * EpiForm
 * EpiForm
@@ -16,3 +26,4 @@ Documentation for the following is coming soon:
 * EpiCache
 * EpiCurl
 * EpiOAuth
+</p>
