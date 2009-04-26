@@ -54,6 +54,14 @@ class EpiTwitterTest extends PHPUnit_Framework_TestCase
     $this->assertEquals($newStatus, $statusText, 'The status was not updated correctly');
   }
 
+  function testPostStatusUnicode()
+  {
+    $statusText = 'Testing a random status with unicode בוקר טוב (' . time() . ')';
+    $resp = $this->twitterObj->post_statusesUpdate(array('status' => $statusText));
+    $newStatus = $resp->text;
+    $this->assertEquals($newStatus, $statusText, 'The status was not updated correctly');
+  }
+
   function testDirectMessage()
   {
     $resp = $this->twitterObj->post_direct_messagesNew( array ( 'user' => $this->screenName, 'text' => "@username that's dirt cheap man, good looking out. I shall buy soon.You still play Halo at all?"));
@@ -82,16 +90,16 @@ class EpiTwitterTest extends PHPUnit_Framework_TestCase
   function testSearch()
   {
     $resp = $this->twitterObj->get_search(array('q' => 'hello'));
-    $this->assertTrue(!empty($resp->response['results']));
+    $this->assertTrue(is_array($resp->response['results']));
   }
 
   function testTrends()
   {
     $resp = $this->twitterObj->get_trends();
-    $this->assertTrue(!empty($resp->response['trends']), "trends is empty");
+    $this->assertTrue(is_array($resp->response['trends']), "trends is empty");
     $resp = $this->twitterObj->get_trends();
 
     $resp = $this->twitterObj->get_trendsCurrent();
-    $this->assertTrue(!empty($resp->response['trends']), "current trends is empty");
+    $this->assertTrue(is_array($resp->response['trends']), "current trends is empty");
   }
 }

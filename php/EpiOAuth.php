@@ -58,9 +58,9 @@ class EpiOAuth
     $this->tokenSecret = $secret;
   } 
 
-  public function encode($string)
+  protected function encode_rfc3986($string)
   {
-    return rawurlencode(utf8_encode($string));
+    return str_replace('+', ' ', str_replace('%7E', '~', rawurlencode(($string))));
   }
 
   protected function addOAuthHeaders(&$ch, $url, $oauthHeaders)
@@ -95,14 +95,14 @@ class EpiOAuth
     $concatenatedParams = '';
     foreach($params as $k => $v)
     {
-      $v = $this->encode($v);
+      $v = $this->encode_rfc3986($v);
       $concatenatedParams .= "{$k}={$v}&";
     }
-    $concatenatedParams = $this->encode(substr($concatenatedParams, 0, -1));
+    $concatenatedParams = $this->encode_rfc3986(substr($concatenatedParams, 0, -1));
 
     // normalize url
-    $normalizedUrl = $this->encode($this->normalizeUrl($url));
-    $method = $this->encode($method); // don't need this but why not?
+    $normalizedUrl = $this->encode_rfc3986($this->normalizeUrl($url));
+    $method = $this->encode_rfc3986($method); // don't need this but why not?
 
     $signatureBaseString = "{$method}&{$normalizedUrl}&{$concatenatedParams}";
     return $this->signString($signatureBaseString);
@@ -172,16 +172,16 @@ class EpiOAuth
     $oauth['oauth_version'] = $this->version;
 
     // encoding
-    array_walk($oauth, array($this, 'encode'));
+    array_walk($oauth, array($this, 'encode_rfc3986'));
     if(is_array($params))
-      array_walk($params, array($this, 'encode'));
+      array_walk($params, array($this, 'encode_rfc3986'));
     $encodedParams = array_merge($oauth, (array)$params);
 
     // sorting
     ksort($encodedParams);
 
     // signing
-    $oauth['oauth_signature'] = $this->encode($this->generateSignature($method, $url, $encodedParams));
+    $oauth['oauth_signature'] = $this->encode_rfc3986($this->generateSignature($method, $url, $encodedParams));
     return array('request' => $params, 'oauth' => $oauth);
   }
 
@@ -191,7 +191,7 @@ class EpiOAuth
     switch($this->signatureMethod)
     {
       case 'HMAC-SHA1':
-        $key = $this->encode($this->consumerSecret) . '&' . $this->encode($this->tokenSecret);
+        $key = $this->encode_rfc3986($this->consumerSecret) . '&' . $this->encode_rfc3986($this->tokenSecret);
         $retval = base64_encode(hash_hmac('sha1', $string, $key, true));
         break;
     }

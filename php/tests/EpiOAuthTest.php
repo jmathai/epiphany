@@ -43,11 +43,26 @@ class EpiTwitterTest extends PHPUnit_Framework_TestCase
     $this->assertEquals(count($parameters), 2, 'prepareParameters did not return a 2 element array');
     $this->assertEquals($this->oauthObj->myUnencode($parameters['oauth']['oauth_signature']), 'tR3+Ty81lMeYAr/Fid0kMTYa/WM=', 'OAuth signature did not match expected value');
   }
+  
+
+  function testGetSignatureUnicode()
+  {
+    $parameters = $this->oauthObj->myPrepareParameters('GET', 'http://photos.example.net/photos', array('size'=>'original','file'=>'vacation.jpg', 'unicode' => 'בוקר טוב'));
+    $this->assertEquals(count($parameters), 2, 'prepareParameters did not return a 2 element array');
+    $this->assertEquals($this->oauthObj->myUnencode($parameters['oauth']['oauth_signature']), 'ccz61+NlB1dtb3Yf/VFqTN7H2QI=', 'OAuth signature did not match expected value');
+  }
 
   function testPostSignature()
   {
     $parameters = $this->oauthObj->myPrepareParameters('POST', 'http://photos.example.net/photos', array('size'=>'original','file'=>'vacation.jpg'));
     $this->assertEquals(count($parameters), 2, 'prepareParameters did not return a 2 element array');
     $this->assertEquals($this->oauthObj->myUnencode($parameters['oauth']['oauth_signature']), 'wPkvxykrw+BTdCcGqKr+3I+PsiM=', 'OAuth signature did not match expected value');
+  }
+
+  function testPostSignatureUnicode()
+  {
+    $parameters = $this->oauthObj->myPrepareParameters('POST', 'http://photos.example.net/photos', array('size'=>'original','file'=>'vacation.jpg', 'unicode' => 'בוקר טוב'));
+    $this->assertEquals(count($parameters), 2, 'prepareParameters did not return a 2 element array');
+    $this->assertEquals($this->oauthObj->myUnencode($parameters['oauth']['oauth_signature']), '34jC8oBml1QYKa8/pSBoavRr+Ek=', 'OAuth signature did not match expected value');
   }
 }
