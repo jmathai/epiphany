@@ -48,10 +48,15 @@ class EpiTwitterTest extends PHPUnit_Framework_TestCase
 
   function testPostStatus()
   {
-    $statusText = 'Testing a random status (' . time() . ')';
+    $statusText = 'Testing a random status (time: ' . time() . ')';
     $resp = $this->twitterObj->post_statusesUpdate(array('status' => $statusText));
     $newStatus = $resp->text;
     $this->assertEquals($newStatus, $statusText, 'The status was not updated correctly');
+    // reply to it
+    $statusText = 'Testing a random status with reply to id (reply to: ' . $resp->id . ')';
+    $resp = $this->twitterObj->post_statusesUpdate(array('status' => $statusText, 'in_reply_to_status_id' => $resp->id));
+    $newStatus = $resp->text;
+    $this->assertEquals($newStatus, $statusText, 'The status with reply to id was not updated correctly');
   }
 
   function testPostStatusUnicode()
