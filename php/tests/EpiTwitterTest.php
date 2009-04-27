@@ -20,12 +20,9 @@ class EpiTwitterTest extends PHPUnit_Framework_TestCase
   function testGetVerifyCredentials()
   {
     $resp = $this->twitterObj->get_accountVerify_credentials();
-    $responseText = $resp->responseText;
-    $responseArray = $resp->response;
-    $screen_name = $resp->screen_name;
-    $this->assertTrue(!empty($responseText), 'responseText was empty');
+    $this->assertTrue(strlen($resp->responseText) > 0, 'responseText was empty');
     $this->assertTrue($resp instanceof EpiTwitterJson, 'response is not an array');
-    $this->assertTrue(!empty($screen_name), 'member property screen_name is empty');
+    $this->assertTrue(!empty($resp->screen_name), 'member property screen_name is empty');
   }
 
   function testGetWithParameters()
@@ -50,21 +47,18 @@ class EpiTwitterTest extends PHPUnit_Framework_TestCase
   {
     $statusText = 'Testing a random status (time: ' . time() . ')';
     $resp = $this->twitterObj->post_statusesUpdate(array('status' => $statusText));
-    $newStatus = $resp->text;
-    $this->assertEquals($newStatus, $statusText, 'The status was not updated correctly');
+    $this->assertEquals($resp->text, $statusText, 'The status was not updated correctly');
     // reply to it
     $statusText = 'Testing a random status with reply to id (reply to: ' . $resp->id . ')';
     $resp = $this->twitterObj->post_statusesUpdate(array('status' => $statusText, 'in_reply_to_status_id' => $resp->id));
-    $newStatus = $resp->text;
-    $this->assertEquals($newStatus, $statusText, 'The status with reply to id was not updated correctly');
+    $this->assertEquals($resp->text, $statusText, 'The status with reply to id was not updated correctly');
   }
 
   function testPostStatusUnicode()
   {
     $statusText = 'Testing a random status with unicode בוקר טוב (' . time() . ')';
     $resp = $this->twitterObj->post_statusesUpdate(array('status' => $statusText));
-    $newStatus = $resp->text;
-    $this->assertEquals($newStatus, $statusText, 'The status was not updated correctly');
+    $this->assertEquals($resp->text, $statusText, 'The status was not updated correctly');
   }
 
   function testDirectMessage()
@@ -96,13 +90,14 @@ class EpiTwitterTest extends PHPUnit_Framework_TestCase
   {
     $resp = $this->twitterObj->get_search(array('q' => 'hello'));
     $this->assertTrue(is_array($resp->response['results']));
+    $this->assertTrue(!empty($resp->results[0]->text), "search response is not an array {$resp->results[0]->text}");
   }
 
   function testTrends()
   {
     $resp = $this->twitterObj->get_trends();
     $this->assertTrue(is_array($resp->response['trends']), "trends is empty");
-    $resp = $this->twitterObj->get_trends();
+    $this->assertTrue(!empty($resp->trends[0]->name), "current trends is not an array " . $resp->trends[0]->name);
 
     $resp = $this->twitterObj->get_trendsCurrent();
     $this->assertTrue(is_array($resp->response['trends']), "current trends is empty");
