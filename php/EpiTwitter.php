@@ -15,6 +15,7 @@ class EpiTwitter extends EpiOAuth
   protected $requestTokenUrl= 'http://twitter.com/oauth/request_token';
   protected $accessTokenUrl = 'http://twitter.com/oauth/access_token';
   protected $authorizeUrl   = 'http://twitter.com/oauth/authorize';
+  protected $authenticateUrl= 'http://twitter.com/oauth/authenticate';
   protected $apiUrl         = 'http://twitter.com';
   protected $searchUrl      = 'http://search.twitter.com';
 
@@ -59,13 +60,13 @@ class EpiTwitterJson implements ArrayAccess, Countable,  IteratorAggregate
   // Implementation of the IteratorAggregate::getIterator() to support foreach ($this as $...)
   public function getIterator ()
   {
-    return new ArrayIterator($this->response);
+    return new ArrayIterator($this->__obj);
   }
 
   // Implementation of Countable::count() to support count($this)
   public function count ()
   {
-    return count($this->response);
+    return count($this->__obj);
   }
   
   // Next four functions are to support ArrayAccess interface
@@ -95,10 +96,13 @@ class EpiTwitterJson implements ArrayAccess, Countable,  IteratorAggregate
 
   public function __get($name)
   {
+    if($this->__resp->code != 200)
+      EpiOAuthException::raise($this->__resp->data, $this->__resp->code);
+
     $this->responseText = $this->__resp->data;
     $this->response     = json_decode($this->responseText, 1);
-    $obj                = json_decode($this->responseText);
-    foreach($obj as $k => $v)
+    $this->__obj        = json_decode($this->responseText);
+    foreach($this->__obj as $k => $v)
     {
       $this->$k = $v;
     }

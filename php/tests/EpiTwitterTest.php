@@ -67,9 +67,12 @@ class EpiTwitterTest extends PHPUnit_Framework_TestCase
     $this->assertTrue(!empty($resp->response['id']), "response id is empty");
   }
 
+  /**
+  * @expectedException EpiOAuthException
+  */
   function testNoRequiredParameter()
   {
-    $resp = $this->twitterObj->post_direct_messagesNew( array ( 'user' => $this->screenName, 'text' => ""));
+    $resp = $this->twitterObj->post_direct_messagesNew( array ( 'user' => $this->screenName, 'text' => ''));
     $this->assertTrue(!empty($resp->response['error']), "An empty direct message should return an error message");
 
   }

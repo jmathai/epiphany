@@ -5,6 +5,7 @@ class EpiOAuth
 
   protected $requestTokenUrl;
   protected $accessTokenUrl;
+  protected $authenticateUrl;
   protected $authorizeUrl;
   protected $consumerKey;
   protected $consumerSecret;
@@ -18,10 +19,14 @@ class EpiOAuth
     return new EpiOAuthResponse($resp);
   }
 
+  public function getAuthenticateUrl()
+  { 
+    $token = $this->getRequestToken();
+    return $this->authenticateUrl . '?oauth_token=' . $token->oauth_token;
+  }
+
   public function getAuthorizationUrl()
   { 
-    $retval = "{$this->authorizeUrl}?";
-
     $token = $this->getRequestToken();
     return $this->authorizeUrl . '?oauth_token=' . $token->oauth_token;
   }
@@ -219,8 +224,8 @@ class EpiOAuthResponse
 
   public function __get($name)
   {
-    if($this->__resp->code < 200 || $this->__resp->code > 299)
-      return false;
+    if($this->__resp->code != 200)
+      EpiOAuthException::raise($this->__resp->data, $this->__resp->code);
 
     parse_str($this->__resp->data, $result);
     foreach($result as $k => $v)
@@ -231,3 +236,23 @@ class EpiOAuthResponse
     return $result[$name];
   }
 }
+
+class EpiOAuthException extends Exception
+{
+  public static function raise($message, $code)
+  {
+    switch($code)
+    {
+      case 400:
+        throw new EpiOAuthBadRequestException($message, $code);
+      case 401:
+        throw new EpiOAuthUnauthorizedException($message, $code);
+      default:
+        throw new EpiOAuthException($message, $code);
+    }
+  }
+}
+
+
+class EpiOAuthBadRequestException extends EpiOAuthException{}
+class EpiOAuthUnauthorizedException extends EpiOAuthException{}
