@@ -12,11 +12,13 @@
 class EpiTwitter extends EpiOAuth
 {
   const EPITWITTER_SIGNATURE_METHOD = 'HMAC-SHA1';
-  protected $requestTokenUrl= 'http://twitter.com/oauth/request_token';
-  protected $accessTokenUrl = 'http://twitter.com/oauth/access_token';
-  protected $authorizeUrl   = 'http://twitter.com/oauth/authorize';
-  protected $authenticateUrl= 'http://twitter.com/oauth/authenticate';
-  protected $apiUrl         = 'http://twitter.com';
+
+  protected $useSSL         = true;
+  protected $requestTokenUrl= 'twitter.com/oauth/request_token';
+  protected $accessTokenUrl = 'twitter.com/oauth/access_token';
+  protected $authorizeUrl   = 'twitter.com/oauth/authorize';
+  protected $authenticateUrl= 'twitter.com/oauth/authenticate';
+  protected $apiUrl         = 'twitter.com';
   protected $searchUrl      = 'http://search.twitter.com';
 
   public function __call($name, $params = null)
@@ -39,13 +41,21 @@ class EpiTwitter extends EpiOAuth
       return new EpiTwitterJson(EpiCurl::getInstance()->addCurl($ch));
     }
 
-    return new EpiTwitterJson(call_user_func(array($this, 'httpRequest'), $method, "{$this->apiUrl}{$path}", $args));
+    $url = "http" . ($this->useSSL ? "s" : "") . "://{$this->apiUrl}{$path}";
+
+    return new EpiTwitterJson(call_user_func(array($this, 'httpRequest'), $method, $url, $args));
   }
 
   public function __construct($consumerKey = null, $consumerSecret = null, $oauthToken = null, $oauthTokenSecret = null)
   {
     parent::__construct($consumerKey, $consumerSecret, self::EPITWITTER_SIGNATURE_METHOD);
     $this->setToken($oauthToken, $oauthTokenSecret);
+  }
+
+  // Turn SSL on or off. Default is true.
+  public function setSSL($useSSL)
+  {
+      $this->useSSL = (bool) $useSSL;
   }
 }
 
