@@ -17,6 +17,13 @@ class EpiTwitterTest extends PHPUnit_Framework_TestCase
     $this->screenName = 'jmathai_test';
   }
 
+  function testBooleanResponse()
+  {
+    $resp = $this->twitterObj->get_friendshipsExists(array('user_a' => 'jmathai_test','user_b' => 'jmathai'));
+    $this->assertTrue(gettype($resp->response) === 'boolean', 'response should be a boolean for friendship exists');
+    $this->assertTrue($resp->response, 'response should be true for friendship exists');
+  }
+
   function testGetVerifyCredentials()
   {
     $resp = $this->twitterObj->get_accountVerify_credentials();

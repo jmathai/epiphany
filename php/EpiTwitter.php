@@ -102,9 +102,13 @@ class EpiTwitterJson implements ArrayAccess, Countable,  IteratorAggregate
     $this->responseText = $this->__resp->data;
     $this->response     = json_decode($this->responseText, 1);
     $this->__obj        = json_decode($this->responseText);
-    foreach($this->__obj as $k => $v)
+
+    if(gettype($this->__obj) === 'object')
     {
-      $this->$k = $v;
+      foreach($this->__obj as $k => $v)
+      {
+        $this->$k = $v;
+      }
     }
 
     return $this->$name;
