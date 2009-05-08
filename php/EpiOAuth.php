@@ -21,15 +21,15 @@ class EpiOAuth
     return new EpiOAuthResponse($resp);
   }
 
-  public function getAuthenticateUrl()
+  public function getAuthenticateUrl($token = null)
   { 
-    $token = $this->getRequestToken();
+    $token = $token ? $token : $this->getRequestToken();
     return $this->getUrl($this->authenticateUrl) . '?oauth_token=' . $token->oauth_token;
   }
 
-  public function getAuthorizationUrl()
+  public function getAuthorizationUrl($token = null)
   { 
-    $token = $this->getRequestToken();
+    $token = $token ? $token : $this->getRequestToken();
     return $this->getUrl($this->authorizeUrl) . '?oauth_token=' . $token->oauth_token;
   }
 
