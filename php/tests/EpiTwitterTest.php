@@ -74,6 +74,14 @@ class EpiTwitterTest extends PHPUnit_Framework_TestCase
     $this->assertTrue(!empty($resp->response['id']), "response id is empty");
   }
 
+  function testPassingInTokenParams()
+  {
+    $this->twitterObj->setToken(null, null);
+    $token = $this->twitterObj->getRequestToken();
+    $authenticateUrl = $this->twitterObj->getAuthorizationUrl($token);
+    $this->assertEquals($token->oauth_token, substr($authenticateUrl, (strpos($authenticateUrl, '=')+1)), "token does not equal the one which was passed in");
+  }
+
   /**
   * @expectedException EpiOAuthException
   */

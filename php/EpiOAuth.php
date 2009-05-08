@@ -12,7 +12,6 @@ class EpiOAuth
   protected $token;
   protected $tokenSecret;
   protected $signatureMethod;
-  protected $curlOpts;
   protected $useSSL = false;
 
   public function getAccessToken()
@@ -42,7 +41,7 @@ class EpiOAuth
   public function getUrl($url)
   {
     if($this->useSSL === true)
-      return preg_replace(array('/^http:/'/*,'/([a-z])\//'*/), array('https:'/*,'\\1:443/'*/), $url);
+      return preg_replace('/^http:/', 'https:', $url);
 
     return $url;
   }
@@ -68,7 +67,6 @@ class EpiOAuth
 
   public function setToken($token = null, $secret = null)
   {
-    $params = func_get_args();
     $this->token = $token;
     $this->tokenSecret = $secret;
   } 
@@ -173,7 +171,7 @@ class EpiOAuth
     $urlParts = parse_url($url);
     $scheme = strtolower($urlParts['scheme']);
     $host   = strtolower($urlParts['host']);
-    $port = intval($urlParts['port']);
+    $port = isset($urlParts['port']) ? intval($urlParts['port']) : 0;
 
     $retval = strtolower($scheme) . '://' . strtolower($host);
 

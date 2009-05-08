@@ -12,7 +12,6 @@
 class EpiTwitter extends EpiOAuth
 {
   const EPITWITTER_SIGNATURE_METHOD = 'HMAC-SHA1';
-
   protected $requestTokenUrl= 'http://twitter.com/oauth/request_token';
   protected $accessTokenUrl = 'http://twitter.com/oauth/access_token';
   protected $authorizeUrl   = 'http://twitter.com/oauth/authorize';
@@ -26,8 +25,7 @@ class EpiTwitter extends EpiOAuth
     $method = strtoupper(array_shift($parts));
     $parts  = implode('_', $parts);
     $path   = '/' . preg_replace('/[A-Z]|[0-9]+/e', "'/'.strtolower('\\0')", $parts) . '.json';
-    if(!empty($params))
-      $args = array_shift($params);
+    $args = !empty($params) ? array_shift($params) : null;
 
     // intercept calls to the search api
     if(preg_match('/^(search|trends)/', $parts))
@@ -40,7 +38,7 @@ class EpiTwitter extends EpiOAuth
       return new EpiTwitterJson(EpiCurl::getInstance()->addCurl($ch));
     }
 
-    $url = $this->getUrl($this->apiUrl) . $path;
+    $url = $this->getUrl("{$this->apiUrl}{$path}");
     return new EpiTwitterJson(call_user_func(array($this, 'httpRequest'), $method, $url, $args));
   }
 
@@ -49,15 +47,9 @@ class EpiTwitter extends EpiOAuth
     parent::__construct($consumerKey, $consumerSecret, self::EPITWITTER_SIGNATURE_METHOD);
     $this->setToken($oauthToken, $oauthTokenSecret);
   }
-
-  // Turn SSL on or off. Default is true.
-  public function setSSL($useSSL)
-  {
-      $this->useSSL = (bool) $useSSL;
-  }
 }
 
-class EpiTwitterJson implements ArrayAccess, Countable,  IteratorAggregate
+class EpiTwitterJson implements ArrayAccess, Countable, IteratorAggregate
 {
   private $__resp;
   public function __construct($response)
@@ -104,11 +96,10 @@ class EpiTwitterJson implements ArrayAccess, Countable,  IteratorAggregate
 
   public function __get($name)
   {
-    $this->responseText = $this->__resp->data;
-
     if($this->__resp->code != 200 && $name !== 'responseText')
       EpiOAuthException::raise($this->__resp->data, $this->__resp->code);
 
+    $this->responseText = $this->__resp->data;
     $this->response     = json_decode($this->responseText, 1);
     $this->__obj        = json_decode($this->responseText);
 
