@@ -13,12 +13,11 @@ class EpiTwitter extends EpiOAuth
 {
   const EPITWITTER_SIGNATURE_METHOD = 'HMAC-SHA1';
 
-  protected $useSSL         = true;
-  protected $requestTokenUrl= 'twitter.com/oauth/request_token';
-  protected $accessTokenUrl = 'twitter.com/oauth/access_token';
-  protected $authorizeUrl   = 'twitter.com/oauth/authorize';
-  protected $authenticateUrl= 'twitter.com/oauth/authenticate';
-  protected $apiUrl         = 'twitter.com';
+  protected $requestTokenUrl= 'http://twitter.com/oauth/request_token';
+  protected $accessTokenUrl = 'http://twitter.com/oauth/access_token';
+  protected $authorizeUrl   = 'http://twitter.com/oauth/authorize';
+  protected $authenticateUrl= 'http://twitter.com/oauth/authenticate';
+  protected $apiUrl         = 'http://twitter.com';
   protected $searchUrl      = 'http://search.twitter.com';
 
   public function __call($name, $params = null)
@@ -41,8 +40,7 @@ class EpiTwitter extends EpiOAuth
       return new EpiTwitterJson(EpiCurl::getInstance()->addCurl($ch));
     }
 
-    $url = "http" . ($this->useSSL ? "s" : "") . "://{$this->apiUrl}{$path}";
-
+    $url = $this->getUrl($this->apiUrl) . $path;
     return new EpiTwitterJson(call_user_func(array($this, 'httpRequest'), $method, $url, $args));
   }
 
@@ -106,10 +104,11 @@ class EpiTwitterJson implements ArrayAccess, Countable,  IteratorAggregate
 
   public function __get($name)
   {
-    if($this->__resp->code != 200)
+    $this->responseText = $this->__resp->data;
+
+    if($this->__resp->code != 200 && $name !== 'responseText')
       EpiOAuthException::raise($this->__resp->data, $this->__resp->code);
 
-    $this->responseText = $this->__resp->data;
     $this->response     = json_decode($this->responseText, 1);
     $this->__obj        = json_decode($this->responseText);
 

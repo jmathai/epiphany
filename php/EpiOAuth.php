@@ -12,29 +12,39 @@ class EpiOAuth
   protected $token;
   protected $tokenSecret;
   protected $signatureMethod;
+  protected $curlOpts;
+  protected $useSSL = false;
 
   public function getAccessToken()
   {
-    $resp = $this->httpRequest('GET', $this->accessTokenUrl);
+    $resp = $this->httpRequest('GET', $this->getUrl($this->accessTokenUrl));
     return new EpiOAuthResponse($resp);
   }
 
   public function getAuthenticateUrl()
   { 
     $token = $this->getRequestToken();
-    return $this->authenticateUrl . '?oauth_token=' . $token->oauth_token;
+    return $this->getUrl($this->authenticateUrl) . '?oauth_token=' . $token->oauth_token;
   }
 
   public function getAuthorizationUrl()
   { 
     $token = $this->getRequestToken();
-    return $this->authorizeUrl . '?oauth_token=' . $token->oauth_token;
+    return $this->getUrl($this->authorizeUrl) . '?oauth_token=' . $token->oauth_token;
   }
 
   public function getRequestToken()
   {
-    $resp = $this->httpRequest('GET', $this->requestTokenUrl);
+    $resp = $this->httpRequest('GET', $this->getUrl($this->requestTokenUrl));
     return new EpiOAuthResponse($resp);
+  }
+
+  public function getUrl($url)
+  {
+    if($this->useSSL === true)
+      return preg_replace(array('/^http:/'/*,'/([a-z])\//'*/), array('https:'/*,'\\1:443/'*/), $url);
+
+    return $url;
   }
 
   public function httpRequest($method = null, $url = null, $params = null)
@@ -63,16 +73,16 @@ class EpiOAuth
     $this->tokenSecret = $secret;
   } 
 
-  protected function encode_rfc3986($string)
+  public function useSSL($use = false)
   {
-    return str_replace('+', ' ', str_replace('%7E', '~', rawurlencode(($string))));
+    $this->useSSL = (bool)$use;
   }
 
   protected function addOAuthHeaders(&$ch, $url, $oauthHeaders)
   {
     $_h = array('Expect:');
     $urlParts = parse_url($url);
-    $oauth = 'Authorization: OAuth realm="' . $urlParts['path'] . '",';
+    $oauth = 'Authorization: OAuth realm="' . $urlParts['scheme'] . '://' . $urlParts['host'] . $urlParts['path'] . '",';
     foreach($oauthHeaders as $name => $value)
     {
       $oauth .= "{$name}=\"{$value}\",";
@@ -80,6 +90,23 @@ class EpiOAuth
     $_h[] = substr($oauth, 0, -1);
   
     curl_setopt($ch, CURLOPT_HTTPHEADER, $_h); 
+  }
+
+  protected function curlInit($url)
+  {
+    $ch = curl_init($url);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    if($this->useSSL === true)
+    {
+      curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+      curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
+    }
+    return $ch;
+  }
+
+  protected function encode_rfc3986($string)
+  {
+    return str_replace('+', ' ', str_replace('%7E', '~', rawurlencode(($string))));
   }
 
   protected function generateNonce()
@@ -124,9 +151,8 @@ class EpiOAuth
       }
       $url = substr($url, 0, -1);
     }
-    $ch = curl_init($url);
+    $ch = $this->curlInit($url);
     $this->addOAuthHeaders($ch, $url, $params['oauth']);
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
     $resp  = $this->curl->addCurl($ch);
 
     return $resp;
@@ -134,11 +160,10 @@ class EpiOAuth
 
   protected function httpPost($url, $params = null)
   {
-    $ch = curl_init($url);
+    $ch = $this->curlInit($url);
     $this->addOAuthHeaders($ch, $url, $params['oauth']);
     curl_setopt($ch, CURLOPT_POST, 1);
     curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($params['request']));
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
     $resp  = $this->curl->addCurl($ch);
     return $resp;
   }
@@ -150,11 +175,11 @@ class EpiOAuth
     $host   = strtolower($urlParts['host']);
     $port = intval($urlParts['port']);
 
-    $retval = "{$scheme}://{$host}";
-    if($port > 0 && ($scheme === 'http' && $port !== 80) || ($scheme === 'https' && $port !== 443))
-    {
+    $retval = strtolower($scheme) . '://' . strtolower($host);
+
+    if(!empty($port) && (($scheme === 'http' && $port != 80) || ($scheme === 'https' && $port != 443)))
       $retval .= ":{$port}";
-    }
+
     $retval .= $urlParts['path'];
     if(!empty($urlParts['query']))
     {

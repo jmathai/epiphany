@@ -112,4 +112,14 @@ class EpiTwitterTest extends PHPUnit_Framework_TestCase
     $resp = $this->twitterObj->get_trendsCurrent();
     $this->assertTrue(is_array($resp->response['trends']), "current trends is empty");
   }
+
+  function testSSl()
+  {
+    $this->twitterObj->useSSL(true);
+    $resp = $this->twitterObj->get_accountVerify_credentials();
+    $this->assertTrue(strlen($resp->responseText) > 0, 'responseText was empty');
+    $this->assertTrue($resp instanceof EpiTwitterJson, 'response is not an array');
+    $this->assertTrue(!empty($resp->screen_name), 'member property screen_name is empty');
+    $this->twitterObj->useSSL(false);
+  }
 }
