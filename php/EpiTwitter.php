@@ -1,13 +1,7 @@
 <?php
 /*
- *  Class to integrate with Twitter's API.
- *    Authenticated calls are done using OAuth and require access tokens for a user.
- *    API calls which do not require authentication do not require tokens (i.e. search/trends)
- * 
- *  Full documentation available on github
- *    http://wiki.github.com/jmathai/epicode/epitwitter
- * 
- *  @author Jaisen Mathai <jaisen@jmathai.com>
+ * DEPRECATED DEPRECATED DEPRECATED DEPRECATED DEPRECATED DEPRECATED
+ * The twitter/oauth libraries are now at https://github.com/jmathai/twitter-async/tree
  */
 class EpiTwitter extends EpiOAuth
 {

@@ -1,4 +1,8 @@
 <?php
+/*
+ * DEPRECATED DEPRECATED DEPRECATED DEPRECATED DEPRECATED DEPRECATED
+ * The twitter/oauth libraries are now at https://github.com/jmathai/twitter-async/tree
+ */
 class EpiOAuth
 {
   public $version = '1.0';
