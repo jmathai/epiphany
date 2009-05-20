@@ -18,7 +18,6 @@ class EpiSession_Php implements EpiSessionInterface
     if(empty($key))
       return false;
 
-    $this->init();
     return $_SESSION[$key];
   }
 
@@ -27,7 +26,6 @@ class EpiSession_Php implements EpiSessionInterface
     if(empty($key))
       return false;
     
-    $this->init();
     $_SESSION[$key] = $value;
     return true;
   }
