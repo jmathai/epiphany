@@ -22,7 +22,7 @@ class EpiSession
 
     $type = array_shift($params);
     if(!file_exists($file = dirname(__FILE__) . "/{$type}.php"))
-      throw new EpiCacheTypeDoesNotExistException("EpiCache type does not exist: ({$type}).  Tried loading {$file}", 404);
+      echo $file;//throw new EpiCacheTypeDoesNotExistException("EpiCache type does not exist: ({$type}).  Tried loading {$file}", 404);
 
     require_once $file;
     self::$instances[$hash] = new $type($params);
