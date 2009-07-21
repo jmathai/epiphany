@@ -20,8 +20,6 @@ if(!defined('EPICODE_VIEWS'))
   define('EPICODE_VIEWS', EPICODE_BASE . '/views');
 }
 
-
-
 /**
  * This is the main EpiCode class.
  * @name    EpiCode
@@ -120,6 +118,7 @@ class EpiCode
       {
         if(dirname($route) != '')
         {
+          error_log('route not found, now calling for ' . dirname($route));
           return self::getRoute(dirname($route), $routes);
         }
       }
@@ -242,9 +241,6 @@ class EpiException extends Exception
   const EPI_EXCEPTION_INSERT    = 6;
   const EPI_EXCEPTION_JSON      = 7;
   const EPI_EXCEPTION_REDIRECT  = 8;
-
-  const EPI_EXCEPTION_DB_CONNECTION = 100;
-  const EPI_EXCEPTION_DB_QUERY = 101;
 
   public function __construct($message = '', $code = 0)
   {

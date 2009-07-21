@@ -22,7 +22,7 @@ class EpiDatabase
       }
       catch(Exception $e)
       {
-        throw new EpiDatabaseConnectionException('Could not connect to database', EpiException::EPI_EXCEPTION_DB_CONNECTION);
+        throw new EpiDatabaseConnectionException('Could not connect to database', EpiDatabaseException::EPI_EXCEPTION_DB_CONNECTION);
       }
     }
     else 
@@ -52,7 +52,7 @@ class EpiDatabase
     catch(PDOException $e)
     {
       $message = $e->getMessage();
-      throw new EpiDatabaseQueryException("Query error: {$message} - {$sql}", EpiException::EPI_EXCEPTION_DB_QUERY);
+      throw new EpiDatabaseQueryException("Query error: {$message} - {$sql}", EpiDatabaseException::EPI_EXCEPTION_DB_QUERY);
     }
   }
   
@@ -68,7 +68,7 @@ class EpiDatabase
     catch(PDOException $e)
     {
       $message = $e->getMessage();
-      throw new EpiDatabaseQueryException("Query error: {$message} - {$sql}", EpiException::EPI_EXCEPTION_DB_QUERY);
+      throw new EpiDatabaseQueryException("Query error: {$message} - {$sql}", EpiDatabaseException::EPI_EXCEPTION_DB_QUERY);
     }
 
     return $retval;
@@ -76,7 +76,7 @@ class EpiDatabase
   
   public static function sql_safe($string)
   {
-    if(strlen($string) > 0) {
+    if($string !== '') {
       return '\'' . addslashes($string) .  '\'';
     }else {
       return 'NULL';
@@ -89,7 +89,7 @@ class EpiDatabase
     
     foreach($var_array as $k => $v)
     {
-      $temp_array[$k] = self::sql_safe($v, $allow_nulls);
+      $temp_array[$k] = self::sql_safe($v);
     }
 
     return $temp_array;
@@ -115,8 +115,10 @@ class EpiDatabase
     catch(PDOException $e)
     {
       $message = $e->getMessage();
-      throw new EpiDatabaseQueryException("Query error: {$message} - {$sql}", EpiException::EPI_EXCEPTION_DB_QUERY);
+      throw new EpiDatabaseQueryException("Query error: {$message} - {$sql}", EpiDatabaseException::EPI_EXCEPTION_DB_QUERY);
     }
+
+    return $retval;
   }
   
   public static function query( $sql = false )
@@ -132,7 +134,7 @@ class EpiDatabase
     catch(PDOException $e)
     {
       $message = $e->getMessage();
-      throw new EpiDatabaseQueryException("Query error: {$message} - {$sql}", EpiException::EPI_EXCEPTION_DB_QUERY);
+      throw new EpiDatabaseQueryException("Query error: {$message} - {$sql}", EpiDatabaseException::EPI_EXCEPTION_DB_QUERY);
     }
   }
   
@@ -161,11 +163,16 @@ class EpiDatabase
   }
 }
 
-if(!class_exists('EpiException')){
+if(!class_exists('EpiException'))
+{
   class EpiException extends Exception{}
 }
 
-class EpiDatabaseException extends EpiException{}
+class EpiDatabaseException extends EpiException
+{
+  const EPI_EXCEPTION_DB_CONNECTION = 100;
+  const EPI_EXCEPTION_DB_QUERY = 101;
+}
 class EpiDatabaseConnectionException extends EpiDatabaseException{}
 class EpiDatabaseQueryException extends EpiDatabaseException{}
 ?>
