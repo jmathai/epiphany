@@ -184,7 +184,7 @@ class EpiCode
   public static function jsonResponse($data)
   {
     $json = self::json($data);
-    header('X-JSON: (' . json_encode($data) . ')');
+    header('X-JSON: (' . $json . ')');
     header('Content-type: application/x-json');
     echo $json;
   }
