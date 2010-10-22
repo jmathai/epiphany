@@ -8,18 +8,6 @@
  * @package EpiCode
  */
 
-// EPICODE_BASE is the full path to the directory that contains your core files (default :: ../)
-if(!defined('EPICODE_BASE'))
-{
-  define('EPICODE_BASE', dirname(dirname(__FILE__)));
-}
-
-// EPICODE_VIEWS is the full path to the directory that contains the views (default :: ./views)
-if(!defined('EPICODE_VIEWS'))
-{
-  define('EPICODE_VIEWS', EPICODE_BASE . '/views');
-}
-
 /**
  * This is the main EpiCode class.
  * @name    EpiCode
@@ -39,7 +27,7 @@ class EpiCode
    */
   public static function display($template = null, $vars = null)
   {
-    $templateInclude = EPICODE_VIEWS . '/' . $template;
+    $templateInclude = Epi::getPath('view') . '/' . $template;
     if(is_file($templateInclude))
     {
       if(is_array($vars))
@@ -66,7 +54,7 @@ class EpiCode
    */
   public static function get($template = null, $vars = null)
   {
-    $templateInclude = EPICODE_VIEWS . '/' . $template;
+    $templateInclude = Epi::getPath('view') . '/' . $template;
     if(is_file($templateInclude))
     {
       if(is_array($vars))
@@ -111,6 +99,7 @@ class EpiCode
         }
         else
         {
+          error_log($route);
           throw new EpiException("Could not call {$arg1}::{$arg2}", EpiException::EPI_EXCEPTION_METHOD);
         }
       }
@@ -223,35 +212,5 @@ class EpiCode
   public static function write($contents = null)
   {
     echo $contents;
-    return true;
   }
 }
-
-/**
- * @author Jaisen Mathai <jaisen@jmathai.com>
- * @uses Exception
- */
-class EpiException extends Exception
-{
-  const EPI_EXCEPTION_ROUTE     = 1;
-  const EPI_EXCEPTION_TEMPLATE  = 2;
-  const EPI_EXCEPTION_METHOD    = 3;
-  const EPI_EXCEPTION_FUNCTION  = 4;
-  const EPI_EXCEPTION_FILE      = 5;
-  const EPI_EXCEPTION_INSERT    = 6;
-  const EPI_EXCEPTION_JSON      = 7;
-  const EPI_EXCEPTION_REDIRECT  = 8;
-
-  public function __construct($message = '', $code = 0)
-  {
-    if(function_exists('EpiExceptionHandler'))
-    {
-      EpiExceptionHandler($message, $code);
-    }
-    else
-    {
-      parent::__construct($message, $code);
-    }
-  }
-}
-?>

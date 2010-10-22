@@ -1,14 +1,9 @@
-h1. EpiCode Documentation
-
-h2. What's EpiCode?
+What's EpiCode?
 
 EpiCode started off as an MVC framework but has evolved into a set of extremely useful tools.  Every tool is completely decoupled so they can be used independently or in conjunction.  Each library in EpiCode is thought out and implemented in an extremely cohesive manner.
 
-h2. Documentation
-
-The toolset consists of the following:
-* "EpiCode":http://wiki.github.com/jmathai/epicode/epicode
-* "EpiTwitter":http://wiki.github.com/jmathai/epicode/epitwitter
+Documentation
+* http://wiki.github.com/jmathai/epicode/epicode
 
 Documentation for the following is coming soon:
 * EpiForm
