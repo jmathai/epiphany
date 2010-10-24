@@ -3,7 +3,7 @@ chdir('..');
 include_once '../src/Epi.php';
 Epi::setPath('base', '../src');
 Epi::setPath('view', '../src');
-Epi::init();
+Epi::init('base','cache');
 /*
  * This is a sample page whch uses EpiCode.
  * There is a .htaccess file which uses mod_rewrite to redirect all requests to index.php while preserving GET parameters.

@@ -10,9 +10,22 @@
 class Epi
 {
   private static $properties;
+  private static $manifest = array(
+    'base'  => 'EpiCode.php',
+    'cache' => array('EpiCache.php', 'cache-apc', 'cache-memcached'),
+    'cache-apc' => array('EpiCache.php', 'EpiCache_Apc.php'),
+    'cache-memcached' => array('EpiCache.php', 'EpiCache_Memcached.php'),
+    'database' => 'EpiDatabase.php'
+  );
+  private static $included = array();
   public static function init()
   {
-    include self::getPath('base') . '/EpiCode.php';
+    $args = func_get_args();
+    if(!empty($args))
+    {
+      foreach($args as $arg)
+        self::loadDependency($arg);
+    }
   }
 
   public static function setPath($name, $path)
@@ -23,6 +36,22 @@ class Epi
   public static function getPath($name)
   {
     return isset(self::$properties["{$name}-path"]) ? self::$properties["{$name}-path"] : null;
+  }
+
+  private static function loadDependency($dep)
+  {
+    $value = isset(self::$manifest[$dep]) ? self::$manifest[$dep] : $dep;
+    if(!is_array($value))
+    {
+      if(!isset(self::$included[$value]))
+        include(self::getPath('base') . "/{$value}");
+      self::$included[$value] = 1;
+    }
+    else
+    {
+      foreach($value as $d)
+        self::loadDependency($d);
+    }
   }
 }
 
