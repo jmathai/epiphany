@@ -15,6 +15,9 @@ class Epi
     'cache' => array('EpiCache.php', 'cache-apc', 'cache-memcached'),
     'cache-apc' => array('EpiCache.php', 'EpiCache_Apc.php'),
     'cache-memcached' => array('EpiCache.php', 'EpiCache_Memcached.php'),
+    'session' => array('EpiSession.php', 'session-apc', 'session-memcached'),
+    'session-apc' => array('EpiSession.php', 'EpiSession_Apc.php'),
+    'session-memcached' => array('EpiSession.php', 'EpiSession_Memcached.php'),
     'database' => 'EpiDatabase.php'
   );
   private static $included = array();
