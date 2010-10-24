@@ -2,7 +2,6 @@
 chdir('..');
 include_once '../src/Epi.php';
 Epi::setPath('base', '../src');
-Epi::setPath('view', '../src');
 Epi::init('base','cache');
 // Epi::init('base','cache','session');
 // Epi::init('base','cache-apc','session-apc');

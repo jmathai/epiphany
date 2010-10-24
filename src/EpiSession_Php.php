@@ -15,7 +15,7 @@ class EpiSession_Php implements EpiSessionInterface
 
   public function get($key = null)
   {
-    if(empty($key))
+    if(empty($key) || !isset($_SESSION[$key]))
       return false;
 
     return $_SESSION[$key];
@@ -27,7 +27,7 @@ class EpiSession_Php implements EpiSessionInterface
       return false;
     
     $_SESSION[$key] = $value;
-    return true;
+    return $value;
   }
 
   public function __construct()

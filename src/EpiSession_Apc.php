@@ -12,7 +12,7 @@ class EpiSession_Apc implements EpiSessionInterface
 
   public function get($key = null)
   {
-    if(empty($key))
+    if(empty($key) || !isset($this->store[$key]))
       return false;
 
     return $this->store[$key];
@@ -30,7 +30,7 @@ class EpiSession_Apc implements EpiSessionInterface
     
     $this->store[$key] = $value;
     apc_store($this->key, $this->store);
-    return true;
+    return $value;
   }
 
   public function __construct($params = null)
