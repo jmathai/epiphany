@@ -75,11 +75,13 @@ class EpiRoute
    * @method redirect
    * @static method
    */
-  public function redirect($url = null)
+  public function redirect($url, $code = null)
   {
     if($url != '')
     {
-      header('Location: ' . $url);
+      if($code != null && (int)$code == $code)
+        header("Status: {$code}");
+      header("Location: {$url}");
       die();
     }
     else
