@@ -11,7 +11,8 @@ class Epi
 {
   private static $properties;
   private static $manifest = array(
-    'base'  => 'EpiCode.php',
+    'route'  => 'EpiRoute.php',
+    'template' => 'EpiTemplate.php',
     'cache' => array('EpiCache.php', 'cache-apc', 'cache-memcached'),
     'cache-apc' => array('EpiCache.php', 'EpiCache_Apc.php'),
     'cache-memcached' => array('EpiCache.php', 'EpiCache_Memcached.php'),

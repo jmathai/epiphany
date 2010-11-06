@@ -1,23 +1,8 @@
 <?php
-/**
- * EpiCode master file
- *
- * This contains the EpiCode class as wel as the EpiException abstract class
- * @author  Jaisen Mathai <jaisen@jmathai.com>
- * @version 1.0  
- * @package EpiCode
- */
-
-/**
- * This is the main EpiCode class.
- * @name    EpiCode
- * @author  Jaisen Mathai <jaisen@jmathai.com>
- * @final
- */
-class EpiCode
+class EpiTemplate
 {
   /**
-   * EpiCode::display('/path/to/template.php', $array);
+   * EpiRoute::display('/path/to/template.php', $array);
    * @name  display
    * @author  Jaisen Mathai <jaisen@jmathai.com>
    * @param string $template
@@ -25,7 +10,7 @@ class EpiCode
    * @method display
    * @static method
    */
-  public static function display($template = null, $vars = null)
+  public function display($template = null, $vars = null)
   {
     $templateInclude = Epi::getPath('view') . '/' . $template;
     if(is_file($templateInclude))
@@ -44,7 +29,7 @@ class EpiCode
   }
   
   /**
-   * EpiCode::get('/path/to/template.php', $array);
+   * EpiRoute::get('/path/to/template.php', $array);
    * @name  get
    * @author  Jaisen Mathai <jaisen@jmathai.com>
    * @param string $template
@@ -52,7 +37,7 @@ class EpiCode
    * @method get
    * @static method
    */
-  public static function get($template = null, $vars = null)
+  public function get($template = null, $vars = null)
   {
     $templateInclude = Epi::getPath('view') . '/' . $template;
     if(is_file($templateInclude))
@@ -72,54 +57,9 @@ class EpiCode
       throw new EpiException("Could not load template: {$templateInclude}", EpiException::EPI_EXCEPTION_TEMPLATE);
     }
   }
-
-  /**
-   * EpiCode::getRoute($_GET['__route__'], $_['routes']); 
-   * @name  getRoute
-   * @author  Jaisen Mathai <jaisen@jmathai.com>
-   * @param string $route
-   * @param array $routes
-   * @method getRoute
-   * @static method
-   */
-  public static function getRoute($route = null, $routes = null)
-  { 
-    if($route != '.' && is_array($routes))
-    {
-      $route = preg_replace('/(\/|\?.*)$/', '', $route);
-      
-      if(isset($routes[$route]))
-      {
-        $arg1  = $routes[$route][0];
-        $arg2  = $routes[$route][1];
-
-        if(method_exists($arg1, $arg2))
-        {
-          call_user_func(array($arg1, $arg2));
-        }
-        else
-        {
-          error_log($route);
-          throw new EpiException("Could not call {$arg1}::{$arg2}", EpiException::EPI_EXCEPTION_METHOD);
-        }
-      }
-      else
-      {
-        if(dirname($route) != '')
-        {
-          error_log('route not found, now calling for ' . dirname($route));
-          return self::getRoute(dirname($route), $routes);
-        }
-      }
-    }
-    else
-    {
-      throw new EpiException("Could not find route {$route} from {$_SERVER['REQUEST_URI']}", EpiException::EPI_EXCEPTION_ROUTE);
-    }
-  }
   
   /**
-   * EpiCode::insert('/path/to/template.php'); 
+   * EpiRoute::insert('/path/to/template.php'); 
    * This method is experimental and undocumented
    * @name  insert
    * @author  Jaisen Mathai <jaisen@jmathai.com>
@@ -128,7 +68,7 @@ class EpiCode
    * @static method
    * @ignore
    */
-  public static function insert($template = null)
+  public function insert($template = null)
   {
     if(file_exists($template))
     {
@@ -141,7 +81,7 @@ class EpiCode
   }
   
   /**
-   * EpiCode::json($variable); 
+   * EpiRoute::json($variable); 
    * @name  json
    * @author  Jaisen Mathai <jaisen@jmathai.com>
    * @param mixed $data
@@ -149,7 +89,7 @@ class EpiCode
    * @method json
    * @static method
    */
-  public static function json($data)
+  public function json($data)
   {
     if($retval = json_encode($data))
     {
@@ -162,7 +102,7 @@ class EpiCode
   }
   
   /**
-   * EpiCode::jsonResponse($variable); 
+   * EpiRoute::jsonResponse($variable); 
    * This method echo's JSON data in the header and to the screen and returns.
    * @name  jsonResponse
    * @author  Jaisen Mathai <jaisen@jmathai.com>
@@ -170,7 +110,7 @@ class EpiCode
    * @method jsonResponse
    * @static method
    */
-  public static function jsonResponse($data)
+  public function jsonResponse($data)
   {
     $json = self::json($data);
     header('X-JSON: (' . $json . ')');
@@ -179,28 +119,7 @@ class EpiCode
   }
   
   /**
-   * EpiCode::redirect($url); 
-   * @name  redirect
-   * @author  Jaisen Mathai <jaisen@jmathai.com>
-   * @param string $url
-   * @method redirect
-   * @static method
-   */
-  public static function redirect($url = null)
-  {
-    if($url != '')
-    {
-      header('Location: ' . $url);
-      die();
-    }
-    else
-    {
-      throw new EpiException(EpiException::EPI_EXCEPTION_REDIRECT, "Redirect to {$url} failed");
-    }
-  }
-  
-  /**
-   * EpiCode::write($contents); 
+   * EpiRoute::write($contents); 
    * This method is experimental and undocumented.
    * @name  write
    * @author  Jaisen Mathai <jaisen@jmathai.com>
@@ -209,7 +128,7 @@ class EpiCode
    * @static method
    * @ignore
    */
-  public static function write($contents = null)
+  public function write($contents = null)
   {
     echo $contents;
   }

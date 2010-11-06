@@ -2,27 +2,20 @@
 chdir('..');
 include_once '../src/Epi.php';
 Epi::setPath('base', '../src');
-Epi::init('base','session-php');
+Epi::init('route','session-php');
 
 /*
- * This is a sample page whch uses EpiCode.
- * There is a .htaccess file which uses mod_rewrite to redirect all requests to index.php while preserving GET parameters.
- * The $_['routes'] array defines all uris which are handled by EpiCode.
- * EpiCode traverses back along the path until it finds a matching page.
- *  i.e. If the uri is /foo/bar and only 'foo' is defined then it will execute that route's action.
- * It is highly recommended to define a default route of '' for the home page or root of the site (yoursite.com/).
+ * This is a sample page which uses native php sessions
+ * It's easy to switch the session backend by passing a different value to getInstance.
+ *  For example, EpiSession::getInstance(EpiSession::Memcached);
  */
-$_['routes'] = array(
-                ''                => array('MyClass', 'MyMethod'), // yoursite.com
-              );
-
-$route = isset($_GET['__route__']) ? $_GET['__route__'] : '';
-EpiCode::getRoute($route, $_['routes']); 
-
+$router = new EpiRoute();
+$router->addRoute('GET', '/', array('MyClass', 'MyMethod'));
+$router->run(); 
 
 /*
  * ******************************************************************************************
- * Define functions and classes which are executed by EpiCode based on the $_['routes'] array
+ * Define functions and classes which are executed by EpiRoute
  * ******************************************************************************************
  */
 class MyClass

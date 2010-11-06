@@ -2,7 +2,7 @@
 chdir('..');
 include_once '../src/Epi.php';
 Epi::setPath('base', '../src');
-Epi::init('base','cache');
+Epi::init('route');
 // Epi::init('base','cache','session');
 // Epi::init('base','cache-apc','session-apc');
 // Epi::init('base','cache-memcached','session-apc');
@@ -15,15 +15,11 @@ Epi::init('base','cache');
  *  i.e. If the uri is /foo/bar and only 'foo' is defined then it will execute that route's action.
  * It is highly recommended to define a default route of '' for the home page or root of the site (yoursite.com/).
  */
-$_['routes'] = array(
-                ''                => array('MyClass', 'MyMethod'), // yoursite.com
-                'sample'          => array('MyClass', 'MyOtherMethod'), // yoursite.com/sample
-                'anypath/source'  => array('MyClass', 'ViewSource'), // yoursite.com/sample
-              );
-
-$route = isset($_GET['__route__']) ? $_GET['__route__'] : '';
-EpiCode::getRoute($route, $_['routes']); 
-
+$router = new EpiRoute();
+$router->addRoute('GET', '/', array('MyClass', 'MyMethod'));
+$router->addRoute('GET', '/sample', array('MyClass', 'MyOtherMethod'));
+$router->addRoute('GET', '/somepath/source', array('MyClass', 'ViewSource'));
+$router->run(); 
 
 /*
  * ******************************************************************************************
@@ -38,9 +34,9 @@ class MyClass
           <ul>
             <li><a href="/simple-site">Call MyClass::MyMethod</a></li>
             <li><a href="/simple-site/sample">Call MyClass::MyOtherMethod</a></li>
-            <li><a href="/simple-site/anypath/source">View the source of this page</a></li>
+            <li><a href="/simple-site/somepath/source">View the source of this page</a></li>
             </ul>
-            <p><img src="http://c.asstatic.com/images/Octavio-11464-Funny-images-music-Entertainment-ppt-powerpoint-118_88.jpg"></p>';
+            <p><img src="https://github.com/images/modules/header/logov3-hover.png"></p>';
   }
 
   static public function MyOtherMethod()
@@ -49,9 +45,9 @@ class MyClass
           <ul>
             <li><a href="/simple-site">Call MyClass::MyMethod</a></li>
             <li><a href="/simple-site/sample">Call MyClass::MyOtherMethod</a></li>
-            <li><a href="/simple-site/anypath/source">View the source of this page</a></li>
+            <li><a href="/simple-site/somepath/source">View the source of this page</a></li>
           </ul>
-          <p><img src="http://zef.me/wp-content/uploads/2008/02/funny-cat.jpg"></p>';
+          <p><img src="http://www.google.com/images/logos/ps_logo2.png"></p>';
   }
 
   static public function ViewSource()
@@ -60,7 +56,7 @@ class MyClass
           <ul>
             <li><a href="/simple-site">Call MyClass::MyMethod</a></li>
             <li><a href="/simple-site/sample">Call MyClass::MyOtherMethod</a></li>
-            <li><a href="/simple-site/anypath/source">View the source of this page</a></li>
+            <li><a href="/simple-site/somepath/source">View the source of this page</a></li>
           </ul>';
     highlight_file(__FILE__);
   }

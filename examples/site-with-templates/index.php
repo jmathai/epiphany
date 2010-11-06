@@ -3,7 +3,7 @@ chdir('..');
 include_once '../src/Epi.php';
 Epi::setPath('base', '../src');
 Epi::setPath('view', 'site-with-templates');
-Epi::init('base');
+Epi::init('route','template');
 
 /*
  * This is a sample page whch uses EpiCode.
@@ -13,13 +13,9 @@ Epi::init('base');
  *  i.e. If the uri is /foo/bar and only 'foo' is defined then it will execute that route's action.
  * It is highly recommended to define a default route of '' for the home page or root of the site (yoursite.com/).
  */
-$_['routes'] = array(
-                ''                => array('MyClass', 'MyMethod'), // yoursite.com
-              );
-
-$route = isset($_GET['__route__']) ? $_GET['__route__'] : '';
-EpiCode::getRoute($route, $_['routes']); 
-
+$router = new EpiRoute();
+$router->addRoute('GET', '/', array('MyClass', 'MyMethod'));
+$router->run(); 
 
 /*
  * ******************************************************************************************
@@ -30,6 +26,12 @@ class MyClass
 {
   static public function MyMethod()
   {
-    EpiCode::display('sample-template.php', array('heading' => 'This is a heading', 'imageSrc' => 'http://c.asstatic.com/images/Octavio-11464-Funny-images-music-Entertainment-ppt-powerpoint-118_88.jpg', 'content' => str_repeat('Lorem ipsum ', 100)));
+    $template = new EpiTemplate();
+    $params = array();
+    $params['heading'] = 'This is a heading';
+    $params['imageSrc'] = 'https://github.com/images/modules/header/logov3-hover.png';
+    $params['content'] = str_repeat('Lorem ipsum ', 100);
+
+    $template->display('sample-template.php', $params);
   }
 }
