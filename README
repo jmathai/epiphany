@@ -1,18 +1,58 @@
-What's EpiCode?
+The Epiphany PHP Framework
+=======================
+#### Fast. Easy. Clean. RESTful
 
-EpiCode started off as an MVC framework but has evolved into a set of extremely useful tools.  Every tool is completely decoupled so they can be used independently or in conjunction.  Each library in EpiCode is thought out and implemented in an extremely cohesive manner.
+----------------------------------------
 
-Documentation
-* http://wiki.github.com/jmathai/epicode/epicode
+### How it looks
 
-Documentation for the following is coming soon:
-* EpiForm
-* EpiForm
-* EpiDatabase
-* EpiCache
-* EpiCurl
-* EpiOAuth
-* EpiDatabase
-* EpiCache
-* EpiCurl
-* EpiOAuth
+The most basic example is including the routing module and defining a few endpoints and providing a callback function that executes when someone requests that page.
+
+    Epi::init('route');
+    $router = new EpiRoute();
+    $router->get('/', 'home');
+    $router->get('/contact', 'contactUs');
+    
+    function home() {
+        echo 'You are at the home page';
+    }
+
+    function contactUs() {
+        echo 'Send us an email at <a href="mailto:foo@bar.com">foo@bar.com</a>';
+    }
+
+----------------------------------------    
+
+### The Manifesto
+
+The Epiphany framework is fast, easy, clean and RESTful. The framework does not do a lot of magic under the hood. It is, by design, very simple and very powerful.
+
+The documentation provides a few conventions that we believe lead to well written code but you're free to use any style you'd like. The framework does never dictates how you should write or structure your application.
+
+----------------------------------------
+
+### What you need
+
+The Epiphany framework only requires PHP 5+, Apache and mod_rewrite. That's all!
+
+----------------------------------------
+
+### Getting started
+
+The following links to documentation and articles will help you get up and running in no time. Included in the repository is an example directory with sub applications highlighting the different features of the Epiphany framework.
+
+1. http://github.com/jmathai/epiphany
+1. https://github.com/jmathai/epiphany/wiki
+
+### The authors
+
+Get in touch with the authors if you have suggestions or questions.
+<table>
+  <tr>
+    <td><img src="http://www.gravatar.com/avatar/e4d1f099d40e3b453be3355349b90457?s=60"></td><td valign="middle">Jaisen Mathai<br>jaisen@jmathai.com<br>http://www.jaisenmathai.com/</td>
+  </tr>
+  <tr>
+    <td><img src="http://www.gravatar.com/avatar/nohash?s=60"></td><td valign="middle">Kevin Hornschemeier<br>khornschemeier@gmail.com<br>http://www.khornschemeier.com</td>
+  </tr>
+
+</table>
