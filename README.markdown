@@ -27,7 +27,7 @@ The most basic example is including the routing module and defining a few endpoi
 
 The Epiphany framework is fast, easy, clean and RESTful. The framework does not do a lot of magic under the hood. It is, by design, very simple and very powerful.
 
-The documentation provides a few conventions that we believe lead to well written code but you're free to use any style you'd like. The framework does never dictates how you should write or structure your application.
+The documentation provides a few conventions that we believe lead to well written code but you're free to use any style you'd like. The framework never dictates how you should write or structure your application.
 
 ----------------------------------------
 
@@ -41,18 +41,17 @@ The Epiphany framework only requires PHP 5+, Apache and mod_rewrite. That's all!
 
 The following links to documentation and articles will help you get up and running in no time. Included in the repository is an example directory with sub applications highlighting the different features of the Epiphany framework.
 
-1. http://github.com/jmathai/epiphany
-1. https://github.com/jmathai/epiphany/wiki
+1. <http://github.com/jmathai/epiphany>
 
 ### The authors
 
 Get in touch with the authors if you have suggestions or questions.
 <table>
   <tr>
-    <td><img src="http://www.gravatar.com/avatar/e4d1f099d40e3b453be3355349b90457?s=60"></td><td valign="middle">Jaisen Mathai<br>jaisen@jmathai.com<br>http://www.jaisenmathai.com/</td>
+    <td><img src="http://www.gravatar.com/avatar/e4d1f099d40e3b453be3355349b90457?s=60"></td><td valign="middle">Jaisen Mathai<br>jaisen-at-jmathai.com<br><a href="http://www.jaisenmathai.com">http://www.jaisenmathai.com</a></td>
   </tr>
   <tr>
-    <td><img src="http://www.gravatar.com/avatar/nohash?s=60"></td><td valign="middle">Kevin Hornschemeier<br>khornschemeier@gmail.com<br>http://www.khornschemeier.com</td>
+    <td><img src="http://www.gravatar.com/avatar/nohash?s=60"></td><td valign="middle">Kevin Hornschemeier<br>khornschemeier-at-gmail.com<br><a href="http://www.khornschemeier.com">http://www.khornschemeier.com</a></td>
   </tr>
 
 </table>
