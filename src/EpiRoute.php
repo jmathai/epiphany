@@ -18,21 +18,44 @@ class EpiRoute
 {
   private $routes = array();
   private $regexes= array();
+  const httpGet = 'GET';
+  const httpPost= 'POST';
 
   /**
-   * addRoute('GET', '/', 'function');
-   * @name  addRoute
+   * get('/', 'function');
+   * @name  get
    * @author  Jaisen Mathai <jaisen@jmathai.com>
-   * @param string $route
-   * @param array $routes
-   * @method run
-   * @static method
+   * @param string $path
+   * @param mixed $callback
    */
-  public function addRoute($method, $path, $callback)
+  public function get($path, $callback)
   {
-    $this->routes[] = array('httpMethod' => $method, 'path' => $path, 'callback' => $callback);
-    $this->regexes[]= "#^{$path}\$#";
+    $this->addRoute($path, $callback, self::httpGet);
   }
+
+  /**
+   * post('/', 'function');
+   * @name  post
+   * @author  Jaisen Mathai <jaisen@jmathai.com>
+   * @param string $path
+   * @param mixed $callback
+   */
+  public function post($path, $callback)
+  {
+    $this->addRoute($path, $callback, self::httpPost);
+  }
+
+  /**
+   * NOT YET IMPLEMENTED
+   * request('/', 'function', array(EpiRoute::httpGet, EpiRoute::httpPost));
+   * @name  request
+   * @author  Jaisen Mathai <jaisen@jmathai.com>
+   * @param string $path
+   * @param mixed $callback
+   */
+  /*public function request($path, $callback, $httpMethods = array(self::httpGet, self::httpPost))
+  {
+  }*/
 
   /**
    * EpiRoute::run($_GET['__route__'], $_['routes']); 
@@ -88,5 +111,19 @@ class EpiRoute
     {
       throw new EpiException(EpiException::EPI_EXCEPTION_REDIRECT, "Redirect to {$url} failed");
     }
+  }
+
+  /**
+   * addRoute('/', 'function', 'GET');
+   * @name  addRoute
+   * @author  Jaisen Mathai <jaisen@jmathai.com>
+   * @param string $path
+   * @param mixed $callback
+   * @param mixed $method
+   */
+  private function addRoute($path, $callback, $method)
+  {
+    $this->routes[] = array('httpMethod' => $method, 'path' => $path, 'callback' => $callback);
+    $this->regexes[]= "#^{$path}\$#";
   }
 }

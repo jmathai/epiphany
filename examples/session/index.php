@@ -10,7 +10,7 @@ Epi::init('route','session-php');
  *  For example, EpiSession::getInstance(EpiSession::Memcached);
  */
 $router = new EpiRoute();
-$router->addRoute('GET', '/', array('MyClass', 'MyMethod'));
+$router->get('/', array('MyClass', 'MyMethod'));
 $router->run(); 
 
 /*

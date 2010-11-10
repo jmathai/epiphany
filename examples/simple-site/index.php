@@ -16,9 +16,9 @@ Epi::init('route');
  * It is highly recommended to define a default route of '' for the home page or root of the site (yoursite.com/).
  */
 $router = new EpiRoute();
-$router->addRoute('GET', '/', array('MyClass', 'MyMethod'));
-$router->addRoute('GET', '/sample', array('MyClass', 'MyOtherMethod'));
-$router->addRoute('GET', '/somepath/source', array('MyClass', 'ViewSource'));
+$router->get('/', array('MyClass', 'MyMethod'));
+$router->get('/sample', array('MyClass', 'MyOtherMethod'));
+$router->get('/somepath/source', array('MyClass', 'ViewSource'));
 $router->run(); 
 
 /*

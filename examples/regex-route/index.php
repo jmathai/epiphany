@@ -9,8 +9,8 @@ Epi::init('route');
  * You can use subpatterns which are passed to the function as parameters.
  */
 $router = new EpiRoute();
-$router->addRoute('GET', '/', 'home');
-$router->addRoute('GET', '/(\w+)/(\w+)', 'greeting');
+$router->get('/', 'home');
+$router->get('/(\w+)/(\w+)', 'greeting');
 $router->run(); 
 
 /*
