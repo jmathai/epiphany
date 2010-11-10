@@ -4,6 +4,12 @@ The Epiphany PHP Framework
 
 ----------------------------------------
 
+### Currently in beta
+
+We're working on finalizing the framework. In the meantime we encourage you to start using it and opening bugs.
+
+----------------------------------------
+
 ### How it looks
 
 The most basic example is including the routing module and defining a few endpoints and providing a callback function that executes when someone requests that page.
