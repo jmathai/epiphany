@@ -17,7 +17,7 @@ class EpiException extends Exception
       echo sprintf("An error occurred and you have <strong>exceptions</strong> disabled so we're displaying the information.
                     To turn exceptions on you should call: <em>Epi::setSetting('exceptions', true);</em>.
                     <ul><li>File: %s</li><li>Line: %s</li><li>Message: %s</li><li>Stack trace: %s</li></ul>",
-        $exception->getFile(), $exception->getLine(), $exception->getMessage(), nl2br($exception->getTraceAsString()));
+                    $exception->getFile(), $exception->getLine(), $exception->getMessage(), nl2br($exception->getTraceAsString()));
     }
   }
 }

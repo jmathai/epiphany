@@ -25,7 +25,6 @@ class Epi
   );
   private static $included = array();
 
-  // quasi constructor
   public static function init()
   {
     $args = func_get_args();
