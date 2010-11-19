@@ -24,7 +24,7 @@ class EpiTemplate
     }
     else
     {
-      throw new EpiException("Could not load template: {$templateInclude}", EpiException::EPI_EXCEPTION_TEMPLATE);
+      EpiException::raise(new EpiException("Could not load template: {$templateInclude}", 404));
     }
   }
   
@@ -54,7 +54,7 @@ class EpiTemplate
     }
     else
     {
-      throw new EpiException("Could not load template: {$templateInclude}", EpiException::EPI_EXCEPTION_TEMPLATE);
+      EpiException::raise(new EpiException("Could not load template: {$templateInclude}", 404));
     }
   }
   
@@ -76,7 +76,7 @@ class EpiTemplate
     }
     else
     {
-      throw new EpiException("Could not insert {$template}", EpiException::EPI_EXCEPTION_INSERT);
+      EpiException::raise(new EpiException("Could not insert template: {$template}", 404));
     }
   }
   
@@ -97,7 +97,8 @@ class EpiTemplate
     }
     else
     {
-      throw new EpiException("JSON encode failed", EpiException::EPI_EXCEPTION_JSON);
+      $dataDump = var_export($dataDump, 1);
+      EpiException::raise(new EpiException("json_encode failed for {$dataDump}", 404));
     }
   }
   

@@ -63,12 +63,9 @@ class EpiCache_Memcached extends EpiCache
       if(@$this->memcached->connect($this->host, $this->port))
         return self::$connected = true;
       else
-        throw new EpiCacheMemcacheConnectException('Could not connect to memcache server', 0);
+        EpiException::raise(new EpiCacheMemcacheConnectException('Could not connect to memcache server'));
     }
 
-    throw new EpiCacheMemcacheClientDneException('No memcache client exists', 0);
+    EpiException::raise(new EpiCacheMemcacheClientDneException('No memcache client exists'));
   }
 }
-
-class EpiCacheMemcacheClientDneException extends EpiCacheException{}
-class EpiCacheMemcacheConnectException extends EpiCacheException{}

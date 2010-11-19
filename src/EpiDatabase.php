@@ -22,7 +22,7 @@ class EpiDatabase
       }
       catch(Exception $e)
       {
-        throw new EpiDatabaseConnectionException('Could not connect to database', EpiDatabaseException::EPI_EXCEPTION_DB_CONNECTION);
+        EpiException::raise(new EpiDatabaseConnectionException('Could not connect to database'));
       }
     }
     else 
@@ -51,8 +51,7 @@ class EpiDatabase
     }
     catch(PDOException $e)
     {
-      $message = $e->getMessage();
-      throw new EpiDatabaseQueryException("Query error: {$message} - {$sql}", EpiDatabaseException::EPI_EXCEPTION_DB_QUERY);
+      EpiException::raise(new EpiDatabaseQueryException("Query error: {$e->getMessage()} - {$sql}"));
     }
   }
   
@@ -67,8 +66,7 @@ class EpiDatabase
     }
     catch(PDOException $e)
     {
-      $message = $e->getMessage();
-      throw new EpiDatabaseQueryException("Query error: {$message} - {$sql}", EpiDatabaseException::EPI_EXCEPTION_DB_QUERY);
+      EpiException::raise(new EpiDatabaseQueryException("Query error: {$e->getMessage()} - {$sql}"));
     }
 
     return $retval;
@@ -114,8 +112,8 @@ class EpiDatabase
     }
     catch(PDOException $e)
     {
-      $message = $e->getMessage();
-      throw new EpiDatabaseQueryException("Query error: {$message} - {$sql}", EpiDatabaseException::EPI_EXCEPTION_DB_QUERY);
+      EpiException::raise(new EpiDatabaseQueryException("Query error: {$e->getMessage()} - {$sql}"));
+      ;
     }
 
     return $retval;
@@ -133,8 +131,8 @@ class EpiDatabase
     }
     catch(PDOException $e)
     {
-      $message = $e->getMessage();
-      throw new EpiDatabaseQueryException("Query error: {$message} - {$sql}", EpiDatabaseException::EPI_EXCEPTION_DB_QUERY);
+      EpiException::raise(new EpiDatabaseQueryException("Query error: {$e->getMessage()} - {$sql}"));
+      ;
     }
   }
   
@@ -162,17 +160,3 @@ class EpiDatabase
     }
   }
 }
-
-if(!class_exists('EpiException'))
-{
-  class EpiException extends Exception{}
-}
-
-class EpiDatabaseException extends EpiException
-{
-  const EPI_EXCEPTION_DB_CONNECTION = 100;
-  const EPI_EXCEPTION_DB_QUERY = 101;
-}
-class EpiDatabaseConnectionException extends EpiDatabaseException{}
-class EpiDatabaseQueryException extends EpiDatabaseException{}
-?>

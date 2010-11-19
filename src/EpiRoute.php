@@ -84,10 +84,10 @@ class EpiRoute
           return call_user_func_array($def['callback'], $arguments);
         }
 
-        throw new EpiException('Could not call ' . json_encode($def) . " for route {$regex}", EpiException::EPI_EXCEPTION_METHOD);
+        EpiException::raise(new EpiException('Could not call ' . json_encode($def) . " for route {$regex}"));
       }
     }
-    throw new EpiException("Could not find route {$route} from {$_SERVER['REQUEST_URI']}", EpiException::EPI_EXCEPTION_ROUTE);
+    EpiException::raise(new EpiException("Could not find route {$route} from {$_SERVER['REQUEST_URI']}"));
   }
 
   /**
@@ -109,7 +109,7 @@ class EpiRoute
     }
     else
     {
-      throw new EpiException(EpiException::EPI_EXCEPTION_REDIRECT, "Redirect to {$url} failed");
+      EpiException::raise(new EpiException("Redirect to {$url} failed"));
     }
   }
 

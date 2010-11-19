@@ -9,20 +9,23 @@
  */
 class Epi
 {
-  private static $properties;
+  private static $properties = array('exceptions-setting' => false);
   private static $manifest = array(
-    'route'  => 'EpiRoute.php',
-    'template' => 'EpiTemplate.php',
-    'cache' => array('EpiCache.php', 'cache-apc', 'cache-memcached'),
-    'cache-apc' => array('EpiCache.php', 'EpiCache_Apc.php'),
-    'cache-memcached' => array('EpiCache.php', 'EpiCache_Memcached.php'),
-    'session' => array('EpiSession.php', 'session-php', 'session-apc', 'session-memcached'),
-    'session-php' => array('EpiSession.php', 'EpiSession_Php.php'),
-    'session-apc' => array('EpiSession.php', 'EpiSession_Apc.php'),
-    'session-memcached' => array('EpiSession.php', 'EpiSession_Memcached.php'),
-    'database' => 'EpiDatabase.php'
+    'base' => array('EpiException.php'),
+    'route'  => array('base', 'EpiRoute.php'),
+    'template' => array('base', 'EpiTemplate.php'),
+    'cache' => array('base', 'EpiCache.php', 'cache-apc', 'cache-memcached'),
+    'cache-apc' => array('base', 'EpiCache.php', 'EpiCache_Apc.php'),
+    'cache-memcached' => array('base', 'EpiCache.php', 'EpiCache_Memcached.php'),
+    'session' => array('base', 'EpiSession.php', 'session-php', 'session-apc', 'session-memcached'),
+    'session-php' => array('base', 'EpiSession.php', 'EpiSession_Php.php'),
+    'session-apc' => array('base', 'EpiSession.php', 'EpiSession_Apc.php'),
+    'session-memcached' => array('base', 'EpiSession.php', 'EpiSession_Memcached.php'),
+    'database' => array('base', 'EpiDatabase.php')
   );
   private static $included = array();
+
+  // quasi constructor
   public static function init()
   {
     $args = func_get_args();
@@ -43,6 +46,16 @@ class Epi
     return isset(self::$properties["{$name}-path"]) ? self::$properties["{$name}-path"] : null;
   }
 
+  public static function setSetting($name, $value)
+  {
+    self::$properties["{$name}-setting"] = $value;
+  }
+
+  public static function getSetting($name)
+  {
+    return isset(self::$properties["{$name}-setting"]) ? self::$properties["{$name}-setting"] : false;
+  }
+
   private static function loadDependency($dep)
   {
     $value = isset(self::$manifest[$dep]) ? self::$manifest[$dep] : $dep;
@@ -57,38 +70,5 @@ class Epi
       foreach($value as $d)
         self::loadDependency($d);
     }
-  }
-}
-
-/**
- * @author Jaisen Mathai <jaisen@jmathai.com>
- * @uses Exception
- */
-class EpiException extends Exception
-{
-  const EPI_EXCEPTION_ROUTE     = 1;
-  const EPI_EXCEPTION_TEMPLATE  = 2;
-  const EPI_EXCEPTION_METHOD    = 3;
-  const EPI_EXCEPTION_FUNCTION  = 4;
-  const EPI_EXCEPTION_FILE      = 5;
-  const EPI_EXCEPTION_INSERT    = 6;
-  const EPI_EXCEPTION_JSON      = 7;
-  const EPI_EXCEPTION_REDIRECT  = 8;
-
-  public function __construct($message = '', $code = 0)
-  {
-    EpiExceptionHandler($message, $code);
-  }
-}
-
-
-if(!function_exists('EpiExceptionHandler'))
-{
-  function EpiExceptionHandler($message, $code)
-  {
-    echo "<h1>An EpiException was thrown</h1>
-          <ul><li>Code: {$code}</li><li>Message: {$message}</li></ul>
-          <p>For more information on handling and catching exceptions visit this page.";
-
   }
 }

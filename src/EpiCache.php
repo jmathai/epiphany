@@ -21,7 +21,7 @@ class EpiCache
 
     $type = array_shift($params);
     if(!file_exists($file = dirname(__FILE__) . "/{$type}.php"))
-      throw new EpiCacheTypeDoesNotExistException("EpiCache type does not exist: ({$type}).  Tried loading {$file}", 404);
+      EpiException::raise(EpiCacheTypeDoesNotExistException("EpiCache type does not exist: ({$type}).  Tried loading {$file}", 404));
 
     require_once $file;
     self::$instances[$hash] = new $type($params);
@@ -56,11 +56,3 @@ class EpiCache
   }
   
 }
-
-if(!class_exists('EpiException')){
-  class EpiException extends Exception{}
-}
-
-class EpiCacheException extends EpiException{}
-class EpiCacheTypeDoesNotExistException extends EpiCacheException{}
-?>
