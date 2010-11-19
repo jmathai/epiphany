@@ -7,6 +7,7 @@ class EpiSession_Memcached implements EpiSessionInterface
   public function end()
   {
     $this->memcached->delete($this->key);
+    $this->store = null;
     setcookie(EpiSession::COOKIE, null, time()-86400);
   }
 

@@ -7,7 +7,7 @@ class EpiSession
 
   // Name of session cookie
   const COOKIE = 'EpiSession';
-  private static $instances;
+  private static $instances, $employ;
 
   /*
    * @param  type  required
@@ -25,10 +25,38 @@ class EpiSession
     self::$instances[$hash]->hash = $hash;
     return self::$instances[$hash];
   }
+
+  /*
+   * @param  type  required
+   * @params optional
+   */
+  public static function employ()
+  {
+    if(func_num_args() === 1)
+      self::$employ = $const;
+
+    return self::$employ;
+  }
 }
 
 interface EpiSessionInterface
 {
   public function get($key = null);
   public function set($key = null, $value = null);
+}
+
+function getSession()
+{
+  $employ = EpiSession::employ();
+  if($employ)
+    return EpiSession::getInstance($employ);
+
+  if(class_exists(EpiSession::PHP))
+    return EpiSession::getInstance(EpiSession::PHP);
+  elseif(class_exists(EpiSession::APC))
+    return EpiSession::getInstance(EpiSession::APC);
+  elseif(class_exists(EpiSession::MEMCACHED))
+    return EpiSession::getInstance(EpiSession::MEMCACHED);
+  else
+    EpiException::raise(new EpiSessionException('Could not determine which session handler to load', 404));
 }
