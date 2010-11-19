@@ -2,9 +2,9 @@
 chdir('..');
 include_once '../src/Epi.php';
 Epi::setPath('base', '../src');
-Epi::init('route','session-php');
-// If you'd like to use Memcached for sessions then init the 'session' or 'session-memcached' module and call EpiSession::employ()
-// EpiSession::employ(EpiSession::MEMCACHED);
+Epi::init('route','cache-apc');
+// If you'd like to use Memcached for cache then init the 'cache' or 'cache-memcached' module and call EpiCache::employ()
+// EpiCache::employ(EpiCache::MEMCACHED);
 
 /*
  * This is a sample page which uses native php sessions
@@ -24,9 +24,12 @@ class MyClass
 {
   static public function MyMethod()
   {
-    $counter = (int)getSession()->get('counter');
-    $counter++;
-    getSession()->set('counter', $counter);
-    echo '<h1>You have clicked ' . getSession()->get('counter') . ' times <a href="">Reload</a></h1>';
+    if(isset($_GET['name']))
+      getCache()->set('name', $_GET['name']);
+
+    $name = getCache()->get('name');
+    if(empty($name))
+      $name = '[Enter your name]';
+    echo '<h1>Hello '. $name . '</h1><p><form><input type="text" size="30" name="name"><br><input type="submit" value="Enter your name"></form></p>';
   }
 }

@@ -3,9 +3,8 @@ class EpiCache
 {
   const MEMCACHED = 'EpiCache_Memcached';
   const APC = 'EpiCache_Apc';
-  private static $instances;
-  private $cached;
-  private $hash;
+  private static $instances, $employ;
+  private $cached, $hash;
   private function __construct(){}
   
   /*
@@ -54,5 +53,29 @@ class EpiCache
     $value = array_pop($params);
     return $this->set(implode('.', $params), $value);
   }
-  
+
+  /*
+   * @param  $const
+   * @params optional
+   */
+  public static function employ()
+  {
+    if(func_num_args() === 1)
+      self::$employ = $const;
+
+    return self::$employ;
+  }
+}
+
+function getCache()
+{
+  $employ = EpiCache::employ();
+  if($employ && class_exists($employ))
+    return EpiCache::getInstance($employ);
+  elseif(class_exists(EpiCache::APC))
+    return EpiCache::getInstance(EpiCache::APC);
+  elseif(class_exists(EpiCache::MEMCACHED))
+    return EpiCache::getInstance(EpiCache::MEMCACHED);
+  else
+    EpiException::raise(new EpiCacheTypeDoesNotExistException('Could not determine which cache handler to load', 404));
 }

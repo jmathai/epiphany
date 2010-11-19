@@ -8,6 +8,7 @@ class EpiSession
   // Name of session cookie
   const COOKIE = 'EpiSession';
   private static $instances, $employ;
+  private function __construct(){}
 
   /*
    * @param  type  required
@@ -27,7 +28,7 @@ class EpiSession
   }
 
   /*
-   * @param  type  required
+   * @param  $const
    * @params optional
    */
   public static function employ()
@@ -48,10 +49,9 @@ interface EpiSessionInterface
 function getSession()
 {
   $employ = EpiSession::employ();
-  if($employ)
+  if($employ && class_exists($employ))
     return EpiSession::getInstance($employ);
-
-  if(class_exists(EpiSession::PHP))
+  elseif(class_exists(EpiSession::PHP))
     return EpiSession::getInstance(EpiSession::PHP);
   elseif(class_exists(EpiSession::APC))
     return EpiSession::getInstance(EpiSession::APC);
