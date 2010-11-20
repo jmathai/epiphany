@@ -28,6 +28,19 @@ $router->run();
  */
 function dbhandler()
 {
-  $users = getDb()->queryAll('SELECT * from user');
-  var_dump($users);
+  $users = getDb()->queryAll('SELECT * FROM user');
+  echo "<h2>All users</h2><ol>";
+  foreach($users as $key => $user)
+  {
+    echo "<li>User {$key} - select privilege = {$user['Select_priv']}</li>";
+  }
+  echo "</ol>";
+
+  $users = getDb()->queryAll('SELECT * FROM user WHERE Host=:Localhost', array(':Localhost' => 'localhost'));
+  echo "<h2>Localhost users</h2><ol>";
+  foreach($users as $key => $user)
+  {
+    echo "<li>User {$key} - select privilege = {$user['Select_priv']}</li>";
+  }
+  echo "</ol>";
 }
