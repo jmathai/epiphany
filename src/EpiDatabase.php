@@ -64,7 +64,7 @@ class EpiDatabase
     return false;
   }
   
-  public function queryAll($sql = false, $params = array())
+  public function all($sql = false, $params = array())
   {
     $this->init();
     try
@@ -79,7 +79,7 @@ class EpiDatabase
     }
   }
   
-  public function queryOne($sql = false, $params = array())
+  public function one($sql = false, $params = array())
   {
     $this->init();
     try
