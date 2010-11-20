@@ -1,44 +1,34 @@
 <?php
 class EpiDatabase
 {
-  static protected $dbh;
+  const MySql = 'mysql';
+  private static $instances = array(), $type, $name, $host, $user, $pass;
+  public $dbh;
+  private function __construct(){}
   
-  public static function connect($type=null, $host=null, $name=null, $user=null,
-    $pass=null)
+  public static function getInstance($type, $name, $host = 'localhost', $user = 'root', $pass = '')
   {
-    if(!self::$dbh)
-    {
-      if($type === null && defined('DB_TYPE')){ $type = DB_TYPE; }
-      if($host === null && defined('DB_HOST')){ $host = DB_HOST; }
-      if($name === null && defined('DB_NAME')){ $name = DB_NAME; }
-      if($user === null && defined('DB_USER')){ $user = DB_USER; }
-      if($pass === null && defined('DB_PASS')){ $pass = DB_PASS; }
-      
-      try
-      {
-        self::$dbh = new PDO($type . ':host=' . $host . ';dbname=' . $name, $user, $pass);
-        self::$dbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-        return self::$dbh;
-      }
-      catch(Exception $e)
-      {
-        EpiException::raise(new EpiDatabaseConnectionException('Could not connect to database'));
-      }
-    }
-    else 
-    {
-      return self::$dbh;
-    }
+    $args = func_get_args();
+    $hash = md5(implode('~', $args));
+    if(self::$instances[$hash])
+      return self::$instances[$hash];
+
+    self::$instances[$hash] = new EpiDatabase();
+    self::$instances[$hash]->type = $type;
+    self::$instances[$hash]->name = $name;
+    self::$instances[$hash]->host = $host;
+    self::$instances[$hash]->user = $user;
+    self::$instances[$hash]->pass = $pass;
+    return self::$instances[$hash];
   }
   
-  public static function query_all($sql)
+  public function queryAll($sql)
   {
-    self::check();
-    
+    $this->init();
     $retval = array();
     try
     {
-      $rs = self::$dbh->query($sql, PDO::FETCH_ASSOC);
+      $rs = $this->dbh->query($sql, PDO::FETCH_ASSOC);
       if($rs)
       {
         foreach($rs as $row)
@@ -55,13 +45,12 @@ class EpiDatabase
     }
   }
   
-  public static function query_first($sql)
+  public function queryFirst($sql)
   {
-    self::check();
-    
+    $this->init();
     try
     {
-      $rs = self::$dbh->query($sql);
+      $rs = $this->dbh->query($sql);
       $retval = $rs->fetch(PDO::FETCH_ASSOC);
     }
     catch(PDOException $e)
@@ -72,71 +61,74 @@ class EpiDatabase
     return $retval;
   }
   
-  public static function sql_safe($string)
+  public function escape($string, $nulls = false)
   {
-    if($string !== '') {
+    if(is_array($string))
+    {
+      return $this->escapeArray($string);
+    }
+    elseif($string !== '' && !$nulls)
+    {
       return '\'' . addslashes($string) .  '\'';
-    }else {
+    }
+    else
+    {
       return 'NULL';
     }
   }
   
-  public static function asql_safe($var_array)
+  public function escapeArray($strings)
   {
-    $temp_array = array();
-    
-    foreach($var_array as $k => $v)
+    foreach($strings as $k => $v)
     {
-      $temp_array[$k] = self::sql_safe($v);
+      $strings[$k] = $this->sqlSafe($v);
     }
 
-    return $temp_array;
+    return $strings;
   }
   
-  public static function insert_id()
+  public function insertId()
   {
-    self::check();
-    $id = self::$dbh->lastInsertId();
+    $this->init();
+    $id = $this->dbh->lastInsertId();
     if ( $id > 0 ) {
       return $id;
     }
     return false;
   }
   
-  public static function execute( $sql = false )
+  public function execute( $sql = false )
   {
-    self::check();
+    $this->init();
     try
     {
-      $retval = self::$dbh->exec($sql);
+      $retval = $this->dbh->exec($sql);
     }
     catch(PDOException $e)
     {
       EpiException::raise(new EpiDatabaseQueryException("Query error: {$e->getMessage()} - {$sql}"));
-      ;
     }
 
     return $retval;
   }
   
-  public static function query( $sql = false )
+  public function query( $sql = false )
   {
-    self::check();
+    $this->init();
     
     $retval = null;
     try
     {
-      $retval = self::$dbh->query($sql, PDO::FETCH_ASSOC);
+      $retval = $this->dbh->query($sql, PDO::FETCH_ASSOC);
       return $retval;
     }
     catch(PDOException $e)
     {
       EpiException::raise(new EpiDatabaseQueryException("Query error: {$e->getMessage()} - {$sql}"));
-      ;
     }
   }
   
-  public static function num_rows( $result = false ) {
+  public function numRows( $result = false ) {
     if ( $result ) {
       $rows = mysql_num_rows( $result );
       if ( $rows > 0 ) {
@@ -146,17 +138,48 @@ class EpiDatabase
     return false;
   }
   
-  public static function found_rows()
+  public function foundRows()
   {
-    $ar = self::query_first('SELECT FOUND_ROWS() AS _FOUND_ROWS');
+    $ar = $this->queryFirst('SELECT FOUND_ROWS() AS _FOUND_ROWS');
     return $ar['_FOUND_ROWS'];
   }
 
-  private static function check()
+  public static function employ($type = null, $name = null, $host = 'localhost', $user = 'root', $pass = '')
   {
-    if(!self::$dbh)
+    if(!empty($type) && !empty($name))
     {
-      self::connect();
+      self::$type = $type;
+      self::$name = $name;
+      self::$host = $host;
+      self::$user = $user;
+      self::$pass = $pass;
+    }
+
+    return array('type' => self::$type, 'name' => self::$name, 'host' => self::$host, 'user' => self::$user, 'pass' => self::$pass);
+  }
+
+  private function init()
+  {
+    if($this->dbh)
+      return;
+
+    try
+    {
+      $this->dbh = PDO($this->type . ':host=' . $this->host . ';dbname=' . $this->name, $this->user, $this->pass);
+      $this->dbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    }
+    catch(Exception $e)
+    {
+      EpiException::raise(new EpiDatabaseConnectionException('Could not connect to database'));
     }
   }
+}
+
+function getDb()
+{
+  $employ = extract(EpiDatabase::employ());
+  if(empty($type) || empty($name) || empty($host) || empty($user))
+    EpiException::raise(new EpiCacheTypeDoesNotExistException('Could not determine which database module to load', 404));
+  else
+    return EpiDatabase::getInstance($type, $name, $host, $user, $pass);
 }

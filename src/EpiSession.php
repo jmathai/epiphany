@@ -7,7 +7,8 @@ class EpiSession
 
   // Name of session cookie
   const COOKIE = 'EpiSession';
-  private static $instances, $use;
+  private static $instances, $employ;
+  private function __construct(){}
 
   /*
    * @param  type  required
@@ -27,16 +28,16 @@ class EpiSession
   }
 
   /*
-   * @param  type  required
+   * @param  $const
    * @params optional
    */
-  /*public static function use()
+  public static function employ()
   {
     if(func_num_args() === 1)
-      self::$use = $const;
+      self::$employ = $const;
 
-    return self::$use;
-  }*/
+    return self::$employ;
+  }
 }
 
 interface EpiSessionInterface
@@ -45,18 +46,17 @@ interface EpiSessionInterface
   public function set($key = null, $value = null);
 }
 
-/*function getSession()
+function getSession()
 {
-  $use = EpiSession::use();
-  if($use)
-    return EpiSession::getInstance($use);
-
-  if(class_exists(EpiSession::PHP))
+  $employ = EpiSession::employ();
+  if($employ && class_exists($employ))
+    return EpiSession::getInstance($employ);
+  elseif(class_exists(EpiSession::PHP))
     return EpiSession::getInstance(EpiSession::PHP);
   elseif(class_exists(EpiSession::APC))
     return EpiSession::getInstance(EpiSession::APC);
-  elseif
+  elseif(class_exists(EpiSession::MEMCACHED))
     return EpiSession::getInstance(EpiSession::MEMCACHED);
   else
-    EpiException::raise(new EpiSessionException('Could not determine which session handler to load', 404);
-}*/
+    EpiException::raise(new EpiSessionException('Could not determine which session handler to load', 404));
+}
