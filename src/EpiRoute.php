@@ -16,6 +16,7 @@
  */
 class EpiRoute
 {
+  private static $instance;
   private $routes = array();
   private $regexes= array();
   const httpGet = 'GET';
@@ -44,7 +45,7 @@ class EpiRoute
   {
     $this->addRoute($path, $callback, self::httpPost);
   }
-
+  
   /**
    * NOT YET IMPLEMENTED
    * request('/', 'function', array(EpiRoute::httpGet, EpiRoute::httpPost));
@@ -57,6 +58,32 @@ class EpiRoute
   {
   }*/
 
+  /**
+   * load('/path/to/file');
+   * @name  load
+   * @author  Jaisen Mathai <jaisen@jmathai.com>
+   * @param string $file
+   */
+  public function load($file)
+  {
+    $file = Epi::getPath('config') . "/{$file}";
+    if(!file_exists($file))
+    {
+      EpiException::raise(new EpiException("Config file ({$file}) does not exist"));
+      break; // need to simulate same behavior if exceptions are turned off
+    }
+
+    $parsed_array = parse_ini_file($file, true);
+    foreach($parsed_array as $route)
+    {
+      $method = strtolower($route['method']);
+      if(isset($route['class']) && isset($route['function']))
+        $this->$method($route['path'], array($route['class'], $route['function']));
+      elseif(isset($route['function']))
+        $this->$method($route['path'], $route['function']);
+    }
+  }
+  
   /**
    * EpiRoute::run($_GET['__route__'], $_['routes']); 
    * @name  run
@@ -113,6 +140,18 @@ class EpiRoute
     }
   }
 
+  /*
+   * EpiRoute::getInstance
+   */
+  public static function getInstance()
+  {
+    if(self::$instance)
+      return self::$instance;
+
+    self::$instance = new EpiRoute;
+    return self::$instance;
+  }
+
   /**
    * addRoute('/', 'function', 'GET');
    * @name  addRoute
@@ -126,4 +165,9 @@ class EpiRoute
     $this->routes[] = array('httpMethod' => $method, 'path' => $path, 'callback' => $callback);
     $this->regexes[]= "#^{$path}\$#";
   }
+}
+
+function getRoute()
+{
+  return EpiRoute::getInstance();
 }
