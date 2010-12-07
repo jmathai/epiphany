@@ -134,3 +134,15 @@ class EpiTemplate
     echo $contents;
   }
 }
+
+
+function getTemplate()
+{
+  static $template;
+  if($template)
+    return $template;
+
+  $template = new EpiTemplate();
+  return $template;
+}
+
