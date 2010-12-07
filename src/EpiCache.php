@@ -61,7 +61,7 @@ class EpiCache
   public static function employ()
   {
     if(func_num_args() === 1)
-      self::$employ = $const;
+      self::$employ = func_get_arg(0);
 
     return self::$employ;
   }

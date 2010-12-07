@@ -47,7 +47,7 @@ class EpiCache_Memcached extends EpiCache
       return false;
 
     $expiry = $ttl === null ? $this->expiry : $ttl;
-    $this->memcached->set($key, $value, $this->compress, $expiry);
+    $this->memcached->set($key, $value, $expiry);
     $this->setEpiCache($key, $value);
     return true;
   }
@@ -57,10 +57,11 @@ class EpiCache_Memcached extends EpiCache
     if(self::$connected === true)
       return true;
 
-    if(class_exists('Memcache'))
+    if(class_exists('Memcached'))
     {
-      $this->memcached = new Memcache;
-      if(@$this->memcached->connect($this->host, $this->port))
+      $this->memcached = new Memcached;
+      
+      if($this->memcached->addServer($this->host, $this->port))
         return self::$connected = true;
       else
         EpiException::raise(new EpiCacheMemcacheConnectException('Could not connect to memcache server'));

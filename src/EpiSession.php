@@ -31,10 +31,12 @@ class EpiSession
    * @param  $const
    * @params optional
    */
-  public static function employ()
+  public static function employ(/*$const*/)
   {
     if(func_num_args() === 1)
-      self::$employ = $const;
+    {
+      self::$employ = func_get_arg(0);
+    }
 
     return self::$employ;
   }
