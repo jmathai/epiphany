@@ -20,6 +20,17 @@ Notice how we specified the `/contactus` route twice with different methods. Thi
 
 ----------------------------------------
 
+### Configuring Apache using .htaccess or VirtualHost directive
+
+In order for the routing to function you'll need to have `mod_rewrite` installed. You can specify the following inside of your VirtualHost directive or in a .htaccess file inside your web root.
+
+    RewriteEngine on
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^(.*)\?*$ index.php?__route__=/$1 [L,QSA]
+
+----------------------------------------
+
 ### Using the helper function
 
 You can call the `getRoute` helper function from anywhere in your code to get access to a singleton instance of EpiRoute. Once you include the route module you can access an `EpiRoute` instance like this.
