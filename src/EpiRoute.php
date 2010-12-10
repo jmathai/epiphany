@@ -19,6 +19,7 @@ class EpiRoute
   private static $instance;
   private $routes = array();
   private $regexes= array();
+  const routeKey= '__route__';
   const httpGet = 'GET';
   const httpPost= 'POST';
 
@@ -93,9 +94,10 @@ class EpiRoute
    * @method run
    * @static method
    */
-  public function run($key = '__route__')
+  public function run($route = false)
   {
-    $route = isset($_GET[$key]) ? $_GET[$key] : '/';
+    if(!$route)
+      $route = isset($_GET[self::routeKey]) ? $_GET[self::routeKey] : '/';
     foreach($this->regexes as $ind => $regex)
     {
       if(preg_match($regex, $route, $arguments))
