@@ -41,28 +41,12 @@ class EpiDatabase
     }
   }
   
-  public function foundRows()
-  {
-    $ar = $this->queryFirst('SELECT FOUND_ROWS() AS _FOUND_ROWS');
-    return $ar['_FOUND_ROWS'];
-  }
-  
   public function insertId()
   {
     $this->init();
     $id = $this->dbh->lastInsertId();
     if ($id > 0) {
       return $id;
-    }
-    return false;
-  }
-  
-  public function numRows($result = false) {
-    if ($result) {
-      $rows = mysql_num_rows($result);
-      if ($rows > 0) {
-        return $rows;
-      }
     }
     return false;
   }

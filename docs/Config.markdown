@@ -13,7 +13,7 @@ You can easily use configuration values by using the `get` and `set` methods.
     $config->set('dbhost', 'localhost');
     $config->get('dbhost');
 
-First you'll need to include the config module and . You can get a singleton instance of the config object by calling `EpiConfig::getInstance()`.
+First you'll need to include the config module. You can get a singleton instance of the config object by calling `EpiConfig::getInstance()`.
 
 ----------------------------------------
 
@@ -59,4 +59,3 @@ The available methods are `get`, `set` and `load`.
     set($name, $value);
     load($filename);
 
-The default value for `$ttl` is 0 which means it will be stored forever. For the Memcached engine the `$ttl` can be seconds from the current time as long as it is less than `60*60*24*30` (seconds in 30 days) otherwise it needs to be a Unix timestamp.
