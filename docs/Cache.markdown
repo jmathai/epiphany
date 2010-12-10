@@ -19,7 +19,7 @@ First you'll need to include the cache module and specify which caching engine y
 
 ### Using the helper function
 
-You can call the `getCache` helper function from anywhere in your code to get access to a singleton instance of EpiCache. The default caching engine is APC but you can override this by calling `EpiCache::employ`.
+You can call the `getCache` helper function from anywhere in your code to get access to a singleton instance of `EpiCache`. The default caching engine is APC but you can override this by calling `EpiCache::employ`.
 
     EpiCache::employ(EpiCache::MEMCACHED);
     getCache()->get('name');
@@ -43,5 +43,12 @@ The default value for `$ttl` is 0 which means it will be stored forever. For the
 ### Requirement for using Memcached
 
 PHP has two different Memcached classes. Epiphany requires the `Memcached` class. The similarly named `Memcache` class does not have a driver in the Epiphany library. To see the differences you can view the respective manual pages.
-    1. http://php.net/Memcached (Supported)
-    1. http://php.net/Memcache (Not Supported)
+
+The `Memcached` class (http://php.net/Memcached) is supported but the `Memcache` class (http://php.net/Memcache) is not. You can check if you have the approprate classes available like this.
+
+    if(class_exists('Memcached')) {
+        echo 'You have got the required Memcached class.';
+    } else {
+        echo 'You do NOT have the required Memcached class.';
+    }
+
