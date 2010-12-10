@@ -59,28 +59,6 @@ class EpiTemplate
   }
   
   /**
-   * EpiRoute::insert('/path/to/template.php'); 
-   * This method is experimental and undocumented
-   * @name  insert
-   * @author  Jaisen Mathai <jaisen@jmathai.com>
-   * @param string $template
-   * @method insert
-   * @static method
-   * @ignore
-   */
-  public function insert($template = null)
-  {
-    if(file_exists($template))
-    {
-      include $template;
-    }
-    else
-    {
-      EpiException::raise(new EpiException("Could not insert template: {$template}", 404));
-    }
-  }
-  
-  /**
    * EpiRoute::json($variable); 
    * @name  json
    * @author  Jaisen Mathai <jaisen@jmathai.com>
@@ -117,21 +95,6 @@ class EpiTemplate
     header('X-JSON: (' . $json . ')');
     header('Content-type: application/x-json');
     echo $json;
-  }
-  
-  /**
-   * EpiRoute::write($contents); 
-   * This method is experimental and undocumented.
-   * @name  write
-   * @author  Jaisen Mathai <jaisen@jmathai.com>
-   * @param string $content
-   * @method write
-   * @static method
-   * @ignore
-   */
-  public function write($contents = null)
-  {
-    echo $contents;
   }
 }
 

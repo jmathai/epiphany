@@ -43,5 +43,5 @@ In addition to `one`, `all` and `execute` you can call `insertId` to get the id 
     one($sql, $params);
     all($sql, $params);
     execute($name, $value);
-    insertId()
+    insertId();
 
