@@ -4,12 +4,6 @@ The Epiphany PHP Framework
 
 ----------------------------------------
 
-### Currently in beta
-
-We're working on finalizing the framework. In the meantime we encourage you to start using it and opening bugs.
-
-----------------------------------------
-
 ### How it looks
 
 The most basic example is including the routing module and defining a few endpoints and providing a callback function that executes when someone requests that page.
@@ -28,6 +22,19 @@ The most basic example is including the routing module and defining a few endpoi
     }
 
 ----------------------------------------    
+
+### Learn more about the modules
+
+Read documentation on the individual modules available in Epiphany.
+
+1. [Route][route]
+2. [Session][session]
+3. [Database][database]
+4. [Cache][cache]
+5. [Config][config]
+
+----------------------------------------
+
 
 ### The Manifesto
 
@@ -61,3 +68,10 @@ Get in touch with the authors if you have suggestions or questions.
   </tr>
 
 </table>
+
+
+[route]: https://github.com/jmathai/epiphany/blob/master/docs/Route.markdown
+[session]: https://github.com/jmathai/epiphany/blob/master/docs/Session.markdown
+[database]: https://github.com/jmathai/epiphany/blob/master/docs/Database.markdown
+[cache]: https://github.com/jmathai/epiphany/blob/master/docs/Cache.markdown
+[config]: https://github.com/jmathai/epiphany/blob/master/docs/Config.markdown
