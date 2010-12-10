@@ -1,6 +1,6 @@
-The Epiphany PHP Framework
+Cache
 =======================
-#### Fast. Easy. Clean. RESTful
+#### The Epiphany PHP Framework
 
 ----------------------------------------
 
