@@ -10,7 +10,7 @@
     {
       if(!is_dir($entry) || $entry[0] == '.')
         continue;
-      echo '<li><a href="/'.$entry.'/">'.$entry.'</li>';
+      echo '<li><a href="'.$entry.'/">'.$entry.'</li>';
     }
   ?>
   </ul>
