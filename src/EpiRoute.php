@@ -19,6 +19,7 @@ class EpiRoute
   private static $instance;
   private $routes = array();
   private $regexes= array();
+  private $route = null;
   const routeKey= '__route__';
   const httpGet = 'GET';
   const httpPost= 'POST';
@@ -96,11 +97,13 @@ class EpiRoute
    */
   public function run($route = false)
   {
-    if(!$route)
-      $route = isset($_GET[self::routeKey]) ? $_GET[self::routeKey] : '/';
+    if($route)
+      $this->route = $route;
+    else
+      $this->route = isset($_GET[self::routeKey]) ? $_GET[self::routeKey] : '/';
     foreach($this->regexes as $ind => $regex)
     {
-      if(preg_match($regex, $route, $arguments))
+      if(preg_match($regex, $this->route, $arguments))
       {
         array_shift($arguments);
         $def = $this->routes[$ind];
@@ -120,7 +123,7 @@ class EpiRoute
         EpiException::raise(new EpiException('Could not call ' . json_encode($def) . " for route {$regex}"));
       }
     }
-    EpiException::raise(new EpiException("Could not find route {$route} from {$_SERVER['REQUEST_URI']}"));
+    EpiException::raise(new EpiException("Could not find route {$this->route} from {$_SERVER['REQUEST_URI']}"));
   }
 
   /**
@@ -145,6 +148,11 @@ class EpiRoute
       die();
     }
     EpiException::raise(new EpiException("Redirect to {$url} failed"));
+  }
+
+  public function route()
+  {
+    return $this->route;
   }
 
   /*
