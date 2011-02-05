@@ -12,6 +12,7 @@ The most basic example is including the routing module and defining a few endpoi
     $router = new EpiRoute();
     $router->get('/', 'home');
     $router->get('/contact', 'contactUs');
+    $router->run();
     
     function home() {
         echo 'You are at the home page';

@@ -13,8 +13,9 @@ Routes represent pages of your application. Traditionally you would have a file 
     $router->get('/', 'home');
     $router->get('/contactus', 'contactUs');
     $router->post('/contactus', 'contactUsPost');
+    $router->run();
 
-The first thing we need to do is include the route module using `Epi::init`. Then we create an instance of `EpiRoute`. Finally we can begin defining our routes. We define a route for our home page and another for a contact page. Each of list a function which gets called when a user visits the corresponding page.
+The first thing we need to do is include the route module using `Epi::init`. Then we create an instance of `EpiRoute`. After that we can begin defining our routes. We define a route for our home page and another for a contact page. Each of list a function which gets called when a user visits the corresponding page. Finally we call the `run` method to execute the page and call the appropriate callback function.
 
 Notice how we specified the `/contactus` route twice with different methods. This allows you to specify different functions to handle the request based on HTTP method.
 
@@ -37,6 +38,7 @@ You can call the `getRoute` helper function from anywhere in your code to get ac
 
     getRoute()->get('/', 'home');
     getRoute()->get('/contact', 'contactUs');
+    getRoute()->run();
 
 
 ----------------------------------------
@@ -47,6 +49,7 @@ If your application has more than 15 routes then you'll want to consider using c
 
     getRoute()->get('/', array('Site', 'home'));
     getRoute()->get('/api/profile', array('Api', 'profile'));
+    getRoute()->run();
 
 When using class methods you should define them as `public` and `static`. This enables the route module to easily call them.
 
