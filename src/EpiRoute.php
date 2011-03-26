@@ -137,7 +137,7 @@ class EpiRoute
   public function redirect($url, $code = null, $offDomain = false)
   {
     $continue = !empty($url);
-    if($offDomain === false && preg_match('#^http://#', $url))
+    if($offDomain === false && preg_match('#^https?://#', $url))
       $continue = false;
 
     if($continue)

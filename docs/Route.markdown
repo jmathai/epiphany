@@ -99,4 +99,14 @@ To load your ini file you'll need to set the path to your config file and call t
     Epi::setPath('config', '/path/to/config/directory');
     getRoute()->load('filename.ini');
 
+----------------------------------------
+
+### Server side redirects
+
+You can perform server side redirects using this module. The `redirect()` method takes between 1 and 3 parameters.
+
+    getRoute()->redirect('/login'); // does a standard http redirect - defaults to 302
+    getRoute()->redirect('/login', 301); // does a 301 redirect
+    getRoute()->redirect($someUrl, null, true); // when true, the third parameter allows urls starting with this regex https?:// - defaults to false
+
 That's enough to get started. Have a look at the examples directory for more usages of the route module.
