@@ -9,9 +9,8 @@ Config
 You can easily use configuration values by using the `get` and `set` methods.
 
     Epi::init('config');
-    $config = EpiConfig::getInstance();
-    $config->set('dbhost', 'localhost');
-    $config->get('dbhost');
+    getConfig()->set('dbhost', 'localhost');
+    getConfig()->get('dbhost');
 
 First you'll need to include the config module. You can get a singleton instance of the config object by calling `EpiConfig::getInstance()`.
 
@@ -58,4 +57,3 @@ The available methods are `get`, `set` and `load`.
     get($name);
     set($name, $value);
     load($filename);
-

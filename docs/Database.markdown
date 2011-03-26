@@ -16,23 +16,32 @@ First you'll need to include the database module. Then you can specify the type,
 
 ----------------------------------------
 
-### Using the helper function
-
-You can call the `getDatabase` helper function from anywhere in your code to get access to a singleton instance of `EpiDatabase`.
-
-    getDatabase()->all('SELECT * FROM user');
-
-----------------------------------------
-
 ### Ways to perform queries
 
 There are three methods to perform queries. They are `one`, `all` and `execute`. The `one` method gets a single record and is useful when you want to query for a single user. The `all` method returns a collection of rows or array of arrays. The `execute` method should be used for INSERT, UPDATE and DELETE statements.
 
 Since the library uses PDO you can write your SQL as a prepared statement with named placeholders denoted by a leading : (colon). The second parameter to all of these methods are an associative array where the key is the placeholder.
 
-    getDatabase()->execute('DELETE FROM user WHERE userId=:id', array(':id' => $userId));
+    getDatabase()->execute('DELETE FROM user WHERE id=:id', array(':id' => $userId));
 
 You do not have to worry about escaping user input as long as you use named placeholders because the PDO library will do that for you.
+
+### SELECT queries
+
+There are two methods for retrieving data. If you want a single row from the database you should call `one()`. To get multiple rows you should call `all()`.
+
+    $singleRow = getDatabase()->one('SELECT * FROM tbl WHERE id=:id', array(':id' => 1));
+    $manyRows = getDatabase()->all('SELECT * FROM tbl WHERE id>:id', array(':id' => 0));
+
+### INSERT, UPDATE and DELETE
+
+To write to the database you'll want to call the `execute()` method.
+
+    $userId = getDatabase()->execute('INSERT INTO user(id, name) VALUES(:id, :name)', array(':id' => 1, ':name' => 'jmathai'));
+    $affectedRows = getDatabase()->execute('UPDATE user SET name=:name WHERE id=:id', array(':id' => 1, ':name' => 'Jaisen'));
+    $affectedRows = getDatabase()->execute('DELETE FROM user WHERE id=:id', array(':id' => 1));
+
+The return value when you call execute depends on the type of query. For `INSERT` queries on tables with an `auto_increment` column you'll get the `auto_increment` value. For `UPDATE` and `DELETE` queries the return value is the number of affected rows.
 
 ----------------------------------------
 
@@ -44,4 +53,3 @@ In addition to `one`, `all` and `execute` you can call `insertId` to get the id 
     all($sql, $params);
     execute($name, $value);
     insertId();
-

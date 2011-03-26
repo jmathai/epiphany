@@ -9,20 +9,11 @@ Cache
 When using the cache module you can select between APC or Memcached. The interface to both are identical so you can switch between them at anytime and in different environments.
 
     Epi::init('cache');
-    $cache = EpiCache::getInstance(EpiCache::APC);
-    $cache->set('name', 'value');
-    $cache->get('name');
+    EpiCache::employ(EpiCache::APC);
+    getCache()->set('name', 'value');
+    $name = getCache()->get('name');
 
 First you'll need to include the cache module and specify which caching engine you'd like to use. You can get a singleton instance of the caching object by calling `EpiCache::getInstance()` which takes either `EpiCache::APC` or `EpiCache::MEMCACHED` as a parameter.
-
-----------------------------------------
-
-### Using the helper function
-
-You can call the `getCache` helper function from anywhere in your code to get access to a singleton instance of `EpiCache`. The default caching engine is APC but you can override this by calling `EpiCache::employ`.
-
-    EpiCache::employ(EpiCache::MEMCACHED);
-    getCache()->get('name');
 
 ----------------------------------------
 

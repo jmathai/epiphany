@@ -9,11 +9,10 @@ Route
 Routes represent pages of your application. Traditionally you would have a file like contact.php that resided in your web root. Routes act the same way but provide a lot more functionality. Instead of having a physical file for every single URL of your application you can define them programmatically. You could define a route as `/contactus` and provide a class method or function. Here's an example.
 
     Epi::init('route');
-    $router = new EpiRoute();
-    $router->get('/', 'home');
-    $router->get('/contactus', 'contactUs');
-    $router->post('/contactus', 'contactUsPost');
-    $router->run();
+    getRoute()->get('/', 'home');
+    getRoute()->get('/contactus', 'contactUs');
+    getRoute()->post('/contactus', 'contactUsPost');
+    getRoute()->run();
 
 The first thing we need to do is include the route module using `Epi::init`. Then we create an instance of `EpiRoute`. After that we can begin defining our routes. We define a route for our home page and another for a contact page. Each of list a function which gets called when a user visits the corresponding page. Finally we call the `run` method to execute the page and call the appropriate callback function.
 
@@ -29,17 +28,6 @@ In order for the routing to function you'll need to have `mod_rewrite` installed
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteCond %{REQUEST_FILENAME} !-d
     RewriteRule ^(.*)\?*$ index.php?__route__=/$1 [L,QSA]
-
-----------------------------------------
-
-### Using the helper function
-
-You can call the `getRoute` helper function from anywhere in your code to get access to a singleton instance of EpiRoute. Once you include the route module you can access an `EpiRoute` instance like this.
-
-    getRoute()->get('/', 'home');
-    getRoute()->get('/contact', 'contactUs');
-    getRoute()->run();
-
 
 ----------------------------------------
 

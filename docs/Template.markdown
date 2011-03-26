@@ -10,8 +10,7 @@ The template module is a lightweight and powerful templating engine that uses na
 
     Epi::init('template');
     Epi::setPath('view', '/path/to/views/directory');
-    $template = new EpiTemplate();
-    $template->display('template.php', array('name' => 'Jaisen'));
+    getTemplate()->display('template.php', array('name' => 'Jaisen'));
 
 
     <!-- template.php -->
@@ -32,14 +31,6 @@ A best practice in your views is to never have a block of php code span more tha
             <li><?php echo $friend['name']; ?></li>
         <?php } ?>
     </ol>
-
-----------------------------------------
-
-### Using the helper function
-
-You can call the `getTemplate` helper function from anywhere in your code to get access to a singleton instance of `EpiTemplate`.
-
-    getTemplate()->display('template.php');
 
 ----------------------------------------
 

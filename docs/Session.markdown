@@ -11,20 +11,19 @@ When using the session module you can select between native PHP sessions, APC or
 The interfaces the session engines are identical so you can switch between them with ease.
 
     Epi::init('session');
-    $session = EpiSession::getInstance(EpiSession::PHP);
-    $session->set('name', 'value');
-    $session->get('name');
+    EpiSession::employ(EpiSession::PHP);
+    getSession()->set('name', 'value');
+    getSession()->get('name');
 
 First you'll need to include the session module and specify which engine you'd like to use. You can get a singleton instance of the caching object by calling `EpiSession::getInstance()` which takes either `EpiSession::PHP`, `EpiSession::APC` or `EpiSession::MEMCACHED` as a parameter.
 
-----------------------------------------
+### Selecting a session driver
 
-### Using the helper function
+To specify which session driver to use you should pass the appropriate value to `EpiSession::employ()`. The interfaces are identical so you can switch between them without issues.
 
-You can call the `getSession` helper function from anywhere in your code to get access to a singleton instance of `EpiSession`. The default caching engine is PHP but you can override this by calling `EpiSession::employ`.
-
-    EpiSession::employ(EpiSession::MEMCACHED);
-    getSession()->get('name');
+    EpiSession::PHP
+    EpiSession::APC
+    EpiSession::Memcached
 
 ----------------------------------------
 

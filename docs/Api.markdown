@@ -57,7 +57,7 @@ Next we can define the class method to display a list of users. From PHP we can 
 
 ### Accessing your API externally over HTTP
 
-If you access `/version.json` then you'll get the results from `Api::version` and similar for `/users.json'.
+If you access `/version.json` then you'll get the results from `Api::version` and similar for `/users.json`.
 
     curl http://localhost/version.json
     "1.0"
@@ -65,7 +65,7 @@ If you access `/version.json` then you'll get the results from `Api::version` an
     curl http://localhost/users.json
     [{"username":"jmathai"},{"username":"stevejobs"},{"username":"billgates"}]
 
-Without having to add any code you have RESTful HTTP API.
+Without having to add any code you have a RESTful HTTP API.
 
 ----------------------------------------
 
