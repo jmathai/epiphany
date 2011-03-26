@@ -15,6 +15,7 @@ Epi::init('api');
 getRoute()->get('/', 'showEndpoints');
 getRoute()->get('/version', 'showVersion');
 getRoute()->get('/users', 'showUsers');
+getRoute()->get('/users/javascript', 'showUsersJavaScript');
 getApi()->get('/version.json', 'apiVersion', EpiApi::external);
 getApi()->get('/users.json', 'apiUsers', EpiApi::external);
 getRoute()->run();
@@ -28,11 +29,12 @@ getRoute()->run();
 function showEndpoints()
 {
   echo '<ul>
-          <li><a href="/api">/</a></li>
-          <li><a href="/api/version">/version</a></li>
-          <li><a href="/api/users">/users</a></li>
-          <li><a href="/api/version.json">/version.json</a></li>
-          <li><a href="/api/users.json">/users.json</a></li>
+          <li><a href="/api">/</a> -> (home)</li>
+          <li><a href="/api/version">/version</a> -> (print the version of the api)</li>
+          <li><a href="/api/users">/users</a> -> (print each user)</li>
+          <li><a href="/api/users/javascript">/users/javascript</a> -> (make an ajax call to the users.json api)</li>
+          <li><a href="/api/version.json">/version.json</a> -> (api endpoint for version.json)</li>
+          <li><a href="/api/users.json">/users.json</a> -> (api endpoint for users.json)</li>
         </ul>';
 }
 
@@ -45,6 +47,27 @@ function showUsers()
     echo "<li>{$user['username']}</li>";
   }
   echo '</ul>';
+}
+
+function showUsersJavaScript()
+{
+  echo <<<MKP
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
+    <a href="/api/users.json">Click to be alerted of users via ajax</a>
+    <script>
+      $("a").click(function(ev) { 
+        var a = ev.target;
+        $.get(a.href, {}, function(users) {
+          var msg = 'Users are: ';
+          for(i in users) {
+            msg += users[i].username + " - ";
+          }
+          alert(msg);
+        }, 'json');
+        return false;
+      });
+    </script>
+MKP;
 }
 
 function showVersion()
@@ -61,6 +84,7 @@ function apiUsers()
 {
   return array(
     array('username' => 'jmathai'),
+    array('username' => 'stevejobs'),
     array('username' => 'billgates')
   );
 }
