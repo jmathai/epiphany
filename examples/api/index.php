@@ -5,12 +5,12 @@ Epi::setPath('base', '../src');
 Epi::init('api');
 
 /*
- * This is a sample page whch uses EpiCode.
- * There is a .htaccess file which uses mod_rewrite to redirect all requests to index.php while preserving GET parameters.
- * The $_['routes'] array defines all uris which are handled by EpiCode.
- * EpiCode traverses back along the path until it finds a matching page.
- *  i.e. If the uri is /foo/bar and only 'foo' is defined then it will execute that route's action.
- * It is highly recommended to define a default route of '' for the home page or root of the site (yoursite.com/).
+ * We create 3 normal routes (think of these are user viewable pages).
+ * We also create 2 api routes (this of these as data methods).
+ *  The beauty of the api routes are they can be accessed natively from PHP
+ *    or remotely via HTTP.
+ *  When accessed over HTTP the response is json.
+ *  When accessed natively it's a php array/string/boolean/etc.
  */
 getRoute()->get('/', 'showEndpoints');
 getRoute()->get('/version', 'showVersion');
