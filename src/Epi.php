@@ -12,6 +12,7 @@ class Epi
   private static $properties = array('exceptions-setting' => false);
   private static $manifest = array(
     '*' => array('base','route','template','cache','session','database'),
+    'api' => array('EpiApi.php', 'route'),
     'base' => array('EpiException.php'),
     'route'  => array('base', 'EpiRoute.php'),
     'template' => array('base', 'EpiTemplate.php'),

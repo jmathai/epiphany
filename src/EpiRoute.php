@@ -28,24 +28,24 @@ class EpiRoute
    * get('/', 'function');
    * @name  get
    * @author  Jaisen Mathai <jaisen@jmathai.com>
-   * @param string $path
+   * @param string $route
    * @param mixed $callback
    */
-  public function get($path, $callback)
+  public function get($route, $callback, $isApi = false)
   {
-    $this->addRoute($path, $callback, self::httpGet);
+    $this->addRoute($route, $callback, self::httpGet, $isApi);
   }
 
   /**
    * post('/', 'function');
    * @name  post
    * @author  Jaisen Mathai <jaisen@jmathai.com>
-   * @param string $path
+   * @param string $route
    * @param mixed $callback
    */
-  public function post($path, $callback)
+  public function post($route, $callback, $isApi = false)
   {
-    $this->addRoute($path, $callback, self::httpPost);
+    $this->addRoute($route, $callback, self::httpPost, $isApi);
   }
   
   /**
@@ -53,10 +53,10 @@ class EpiRoute
    * request('/', 'function', array(EpiRoute::httpGet, EpiRoute::httpPost));
    * @name  request
    * @author  Jaisen Mathai <jaisen@jmathai.com>
-   * @param string $path
+   * @param string $route
    * @param mixed $callback
    */
-  /*public function request($path, $callback, $httpMethods = array(self::httpGet, self::httpPost))
+  /*public function request($route, $callback, $httpMethods = array(self::httpGet, self::httpPost))
   {
   }*/
 
@@ -95,29 +95,58 @@ class EpiRoute
    * @method run
    * @static method
    */
-  public function run($route = false)
+  public function run($route = false, $httpMethod = null)
+  {
+    if($route === false)
+      $route = isset($_GET[self::routeKey]) ? $_GET[self::routeKey] : '/';
+
+    if($httpMethod === null)
+      $httpMethod = $_SERVER['REQUEST_METHOD'];
+    $routeDef = $this->getRoute($route, $httpMethod);
+
+    $response = call_user_func_array($routeDef['callback'], $routeDef['args']);
+    if(!$routeDef['postprocess'])
+      return $response;
+    else
+      echo json_encode($response);
+  }
+
+
+  /**
+   * EpiRoute::getRoute($route); 
+   * @name  getRoute
+   * @author  Jaisen Mathai <jaisen@jmathai.com>
+   * @param string $route
+   * @method getRoute
+   * @static method
+   */
+  public function getRoute($route = false, $httpMethod = null)
   {
     if($route)
       $this->route = $route;
     else
       $this->route = isset($_GET[self::routeKey]) ? $_GET[self::routeKey] : '/';
+
+    if($httpMethod === null)
+      $httpMethod = $_SERVER['REQUEST_METHOD'];
+
     foreach($this->regexes as $ind => $regex)
     {
       if(preg_match($regex, $this->route, $arguments))
       {
         array_shift($arguments);
         $def = $this->routes[$ind];
-        if($_SERVER['REQUEST_METHOD'] != $def['httpMethod'])
+        if($httpMethod != $def['httpMethod'])
         {
           continue;
         }
         else if(is_array($def['callback']) && method_exists($def['callback'][0], $def['callback'][1]))
         {
-          return call_user_func_array($def['callback'], $arguments);
+          return array('callback' => $def['callback'], 'args' => $arguments, 'postprocess' => $def['postprocess']);
         }
         else if(function_exists($def['callback']))
         {
-          return call_user_func_array($def['callback'], $arguments);
+          return array('callback' => $def['callback'], 'args' => $arguments, 'postprocess' => $def['postprocess']);
         }
 
         EpiException::raise(new EpiException('Could not call ' . json_encode($def) . " for route {$regex}"));
@@ -171,14 +200,15 @@ class EpiRoute
    * addRoute('/', 'function', 'GET');
    * @name  addRoute
    * @author  Jaisen Mathai <jaisen@jmathai.com>
-   * @param string $path
+   * @param string $route
    * @param mixed $callback
    * @param mixed $method
+   * @param string $callback
    */
-  private function addRoute($path, $callback, $method)
+  private function addRoute($route, $callback, $method, $postprocess = false)
   {
-    $this->routes[] = array('httpMethod' => $method, 'path' => $path, 'callback' => $callback);
-    $this->regexes[]= "#^{$path}\$#";
+    $this->routes[] = array('httpMethod' => $method, 'path' => $route, 'callback' => $callback, 'postprocess' => $postprocess);
+    $this->regexes[]= "#^{$route}\$#";
   }
 }
 
