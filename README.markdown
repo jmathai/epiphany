@@ -29,10 +29,11 @@ The most basic example is including the routing module and defining a few endpoi
 Read documentation on the individual modules available in Epiphany.
 
 1. [Route][route] - A RESTful routing library to map paths to functions.
-2. [Session][session] - A multi-engine session library which supports native PHP sessions, APC and Memcached.
-3. [Database][database] - A simple interface to PDO's MySql driver.
-4. [Cache][cache] - A easy caching library which supports APC and Memcached.
-5. [Config][config] - An ini based configuration library that supports overloading.
+2. [Api][api] - An API helper module to create private and public APIs. This is both new and awesome.
+3. [Session][session] - A multi-engine session library which supports native PHP sessions, APC and Memcached.
+4. [Database][database] - A simple interface to PDO's MySql driver.
+5. [Cache][cache] - A easy caching library which supports APC and Memcached.
+6. [Config][config] - An ini based configuration library that supports overloading.
 
 ----------------------------------------
 
@@ -72,6 +73,7 @@ Get in touch with the authors if you have suggestions or questions.
 
 
 [route]: https://github.com/jmathai/epiphany/blob/master/docs/Route.markdown
+[api]: https://github.com/jmathai/epiphany/blob/master/docs/Api.markdown
 [session]: https://github.com/jmathai/epiphany/blob/master/docs/Session.markdown
 [database]: https://github.com/jmathai/epiphany/blob/master/docs/Database.markdown
 [cache]: https://github.com/jmathai/epiphany/blob/master/docs/Cache.markdown
