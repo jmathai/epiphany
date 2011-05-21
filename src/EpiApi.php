@@ -26,7 +26,7 @@ class EpiApi
   {
     $this->addRoute($route, $callback, EpiRoute::httpPost);
     if($visibility === self::external)
-      getRoute()->get($route, $callback, true);
+      getRoute()->post($route, $callback, true);
   }
 
   public function invoke($route, $httpMethod = EpiRoute::httpGet)
