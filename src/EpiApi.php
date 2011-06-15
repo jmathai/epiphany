@@ -34,6 +34,7 @@ class EpiApi
     $routeDef = getRoute()->getRoute($route, $httpMethod);
 
     // this is ugly but required if internal and external calls are to work
+    $tmps = array();
     foreach($params as $type => $value)
     {
       $tmps[$type] = $GLOBALS[$type];
