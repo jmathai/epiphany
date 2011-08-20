@@ -38,9 +38,12 @@ class EpiConfig
     }
   }
 
-  public function get($key)
+  public function get($key = null)
   {
-    return $this->config->$key;
+    if(!empty($key))
+      return $this->config->$key;
+    else
+      return $this->config;
   }
 
   public function set($key, $val)
