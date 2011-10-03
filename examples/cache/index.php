@@ -11,9 +11,8 @@ Epi::init('route','cache-apc');
  * It's easy to switch the session backend by passing a different value to getInstance.
  *  For example, EpiSession::getInstance(EpiSession::Memcached);
  */
-$router = new EpiRoute();
-$router->get('/', array('MyClass', 'MyMethod'));
-$router->run(); 
+getRoute()->get('/', array('MyClass', 'MyMethod'));
+getRoute()->run(); 
 
 /*
  * ******************************************************************************************

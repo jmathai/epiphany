@@ -8,10 +8,9 @@ Epi::init('route');
  * This file is an example of using regular expressions in a route.
  * You can use subpatterns which are passed to the function as parameters.
  */
-$router = new EpiRoute();
-$router->get('/', 'home');
-$router->get('/(\w+)/(\w+)', 'greeting');
-$router->run(); 
+getRoute()->get('/', 'home');
+getRoute()->get('/(\w+)/(\w+)', 'greeting');
+getRoute()->run(); 
 
 /*
  * ******************************************************************************************

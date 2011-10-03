@@ -15,11 +15,10 @@ Epi::init('route');
  *  i.e. If the uri is /foo/bar and only 'foo' is defined then it will execute that route's action.
  * It is highly recommended to define a default route of '' for the home page or root of the site (yoursite.com/).
  */
-$router = new EpiRoute();
-$router->get('/', array('MyClass', 'MyMethod'));
-$router->get('/sample', array('MyClass', 'MyOtherMethod'));
-$router->get('/somepath/source', array('MyClass', 'ViewSource'));
-$router->run(); 
+getRoute()->get('/', array('MyClass', 'MyMethod'));
+getRoute()->get('/sample', array('MyClass', 'MyOtherMethod'));
+getRoute()->get('/somepath/source', array('MyClass', 'ViewSource'));
+getRoute()->run(); 
 
 /*
  * ******************************************************************************************
