@@ -10,9 +10,8 @@ Epi::init('route');
  * Load the routes from routes.ini then call run()
  * ******************************************************************************************
  */
-$router = new EpiRoute();
-$router->load('routes.ini');
-$router->run(); 
+getRoute()->load('routes.ini');
+getRoute()->run(); 
 
 /*
  * ******************************************************************************************

@@ -17,9 +17,8 @@ EpiDatabase::employ('mysql','mysql','localhost','root',''); // type = mysql, dat
  *  i.e. If the uri is /foo/bar and only 'foo' is defined then it will execute that route's action.
  * It is highly recommended to define a default route of '' for the home page or root of the site (yoursite.com/).
  */
-$router = new EpiRoute();
-$router->get('/', 'dbhandler');
-$router->run(); 
+getRoute()->get('/', 'dbhandler');
+getRoute()->run(); 
 
 /*
  * ******************************************************************************************

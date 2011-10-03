@@ -11,11 +11,10 @@ Epi::setPath('base', '../epiphany/src');
 Epi::setPath('view', './views');
 Epi::init('route','template','session');
 
-$router = new EpiRoute();
-$router->get('/', array('HomeController', 'display'));
-$router->get('/login', array('LoginController', 'display'));
-$router->post('/login', array('LoginController', 'processLogin'));
-$router->get('/dashboard', array('DashboardController', 'display'));
-$router->get('/logout', array('LogoutController', 'processLogout'));
-$router->run();
+getRoute()->get('/', array('HomeController', 'display'));
+getRoute()->get('/login', array('LoginController', 'display'));
+getRoute()->post('/login', array('LoginController', 'processLogin'));
+getRoute()->get('/dashboard', array('DashboardController', 'display'));
+getRoute()->get('/logout', array('LogoutController', 'processLogout'));
+getRoute()->run();
 ?>
