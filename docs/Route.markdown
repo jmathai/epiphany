@@ -96,5 +96,18 @@ You can perform server side redirects using this module. The `redirect()` method
     getRoute()->redirect('/login'); // does a standard http redirect - defaults to 302
     getRoute()->redirect('/login', 301); // does a 301 redirect
     getRoute()->redirect($someUrl, null, true); // when true, the third parameter allows urls starting with this regex https?:// - defaults to false
+    
+----------------------------------------
+
+### Compatibility
+
+Another way to set routes that may be more compatible when working with other libraries is
+
+    Epi::init('route');
+    $router = new EpiRoute();
+    $router->get('/', 'home');
+    $router->get('/contactus', 'contactUs');
+    $router->post('/contactus', 'contactUsPost');
+    $router->run();
 
 That's enough to get started. Have a look at the examples directory for more usages of the route module.

@@ -12,15 +12,17 @@ class EpiTemplate
    */
   public function display($template = null, $vars = null)
   {
+    if(is_array($vars))
+    {
+      extract($vars);
+    }
     $templateInclude = Epi::getPath('view') . '/' . $template;
     if(is_file($templateInclude))
     {
-      if(is_array($vars))
-      {
-        extract($vars);
-      }
-      
       include $templateInclude;
+    }
+    else if (is_file($template)) {
+      include $template;
     }
     else
     {

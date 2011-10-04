@@ -9,10 +9,9 @@ The Epiphany PHP Framework
 The most basic example is including the routing module and defining a few endpoints and providing a callback function that executes when someone requests that page.
 
     Epi::init('route');
-    $router = new EpiRoute();
-    $router->get('/', 'home');
-    $router->get('/contact', 'contactUs');
-    $router->run();
+    getRoute()->get('/', 'home');
+    getRoute()->get('/contact', 'contactUs');
+    getRoute()->run();
     
     function home() {
         echo 'You are at the home page';
