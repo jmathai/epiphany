@@ -111,7 +111,6 @@ class EpiRoute
       echo json_encode($response);
   }
 
-
   /**
    * EpiRoute::getRoute($route); 
    * @name  getRoute

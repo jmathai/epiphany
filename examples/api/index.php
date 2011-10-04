@@ -21,6 +21,7 @@ getApi()->get('/version.json', 'apiVersion', EpiApi::external);
 getApi()->get('/users.json', 'apiUsers', EpiApi::external);
 getApi()->get('/params.json', 'apiParams', EpiApi::external);
 getApi()->get('/params-internal.json', 'apiParams', EpiApi::internal);
+getApi()->get('/params-internal-from-external.json', 'apiParamsFromExternal', EpiApi::external);
 getRoute()->run();
 
 /*
@@ -39,6 +40,7 @@ function showEndpoints()
           <li><a href="/api/params">/params</a> -> (simulate get/post params to the api call)</li>
           <li><a href="/api/version.json">/version.json</a> -> (api endpoint for version.json)</li>
           <li><a href="/api/users.json">/users.json</a> -> (api endpoint for users.json)</li>
+          <li><a href="/api/params-internal-from-external.json">/params-internal-from-external.json</a> -> (private api should be accessible from external)</li>
           <li><a href="/api/params-internal.json">/params-internal.json</a> -> (private api should not be accessible)</li>
         </ul>';
 }
@@ -115,4 +117,10 @@ function apiUsers()
 function apiParams()
 {
   return $_GET;
+}
+
+function apiParamsFromExternal()
+{
+  $res = getApi()->invoke('/params-internal.json', EpiRoute::httpGet);
+  return $res;
 }
