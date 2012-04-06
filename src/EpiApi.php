@@ -28,6 +28,20 @@ class EpiApi
     if($visibility === self::external)
       getRoute()->post($route, $callback, true);
   }
+  
+  public function put($route, $callback, $visibility = self::internal)
+  {
+    $this->addRoute($route, $callback, EpiRoute::httpPut);
+    if($visibility === self::external)
+      getRoute()->put($route, $callback, true);
+  }
+  
+  public function delete($route, $callback, $visibility = self::internal)
+  {
+    $this->addRoute($route, $callback, EpiRoute::httpDelete);
+    if($visibility === self::external)
+      getRoute()->delete($route, $callback, true);
+  }
 
   public function invoke($route, $httpMethod = EpiRoute::httpGet, $params = array())
   {
