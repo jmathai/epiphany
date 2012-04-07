@@ -23,6 +23,8 @@ class EpiRoute
   const routeKey= '__route__';
   const httpGet = 'GET';
   const httpPost= 'POST';
+  const httpPut = 'PUT';
+  const httpDelete = 'DELETE';
 
   /**
    * get('/', 'function');
@@ -47,7 +49,31 @@ class EpiRoute
   {
     $this->addRoute($route, $callback, self::httpPost, $isApi);
   }
+
+  /**
+   * put('/', 'function');
+   * @name  put
+   * @author  Sandro Meier <sandro.meier@fidelisfactory.ch>
+   * @param string $route
+   * @param mixed $callback
+   */
+  public function put($route, $callback, $isApi = false)
+  {
+    $this->addRoute($route, $callback, self::httpPut, $isApi);
+  }
   
+  /**
+   * delete('/', 'function');
+   * @name  delete
+   * @author  Sandro Meier <sandro.meier@fidelisfactory.ch>
+   * @param string $route
+   * @param mixed $callback
+   */
+  public function delete($route, $callback, $isApi = false)
+  {
+    $this->addRoute($route, $callback, self::httpDelete, $isApi);
+  }
+
   /**
    * NOT YET IMPLEMENTED
    * request('/', 'function', array(EpiRoute::httpGet, EpiRoute::httpPost));
