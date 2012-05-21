@@ -134,7 +134,13 @@ class EpiRoute
     if(!$routeDef['postprocess'])
       return $response;
     else
-      echo json_encode($response);
+    {
+      // Only echo the response if it's not null. 
+      if (!is_null($response))
+      {
+        echo json_encode($response);
+      }
+    }
   }
 
   /**
