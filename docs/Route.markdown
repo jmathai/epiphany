@@ -29,6 +29,28 @@ In order for the routing to function you'll need to have `mod_rewrite` installed
     RewriteCond %{REQUEST_FILENAME} !-d
     RewriteRule ^(.*)\?*$ index.php?__route__=/$1 [L,QSA]
 
+### Configuring IIS using Web.config file
+
+In order for the routing to function you'll need to have `URL Rewrite Module` installed. You can specify the following inside of your Web.config file inside your web root.
+
+    <?xml version="1.0" encoding="UTF-8"?>
+    <configuration>
+        <system.webServer>
+            <rewrite>
+                <rules>
+                    <rule name="epiphany" patternSyntax="Wildcard">
+                        <match url="*" />
+                        <conditions>
+                            <add input="{REQUEST_FILENAME}" matchType="IsFile" negate="true" />
+                            <add input="{REQUEST_FILENAME}" matchType="IsDirectory" negate="true" />
+                        </conditions>
+                        <action type="Rewrite" url="index.php?__route__=/{R:1}" appendQueryString="true" />
+                    </rule>
+                </rules>
+            </rewrite>
+        </system.webServer>
+    </configuration>
+
 ----------------------------------------
 
 ### Using class methods instead of functions
