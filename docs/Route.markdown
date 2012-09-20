@@ -28,6 +28,14 @@ In order for the routing to function you'll need to have `mod_rewrite` installed
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteCond %{REQUEST_FILENAME} !-d
     RewriteRule ^(.*)\?*$ index.php?__route__=/$1 [L,QSA]
+	
+### Configuring Nginx
+
+In order for the routing to function you'll need to have `HttpRewriteModule` installed. You can specify the following inside of your server configuration.
+
+	if (!-e $request_filename) {
+	  rewrite ^(.*) /index.php?__route__=$1 last;
+	}
 
 ### Configuring IIS using Web.config file
 
