@@ -139,7 +139,12 @@ class EpiRoute
       if (!is_null($response))
       {
         $response = json_encode($response);
-        if(isset($_GET['callback'])) $response = "{$_GET['callback']}($response)";
+        if(isset($_GET['callback']))
+          $response = "{$_GET['callback']}($response)";
+        else
+          header('Content-Type: application/json');
+
+        header('Content-Length:' . strlen($response));
         echo $response;
       }
     }
