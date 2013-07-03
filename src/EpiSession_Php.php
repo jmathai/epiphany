@@ -32,6 +32,7 @@ class EpiSession_Php implements EpiSessionInterface
 
   public function __construct()
   {
-    session_start();
+    if (!session_id())
+      session_start();
   }
 }
