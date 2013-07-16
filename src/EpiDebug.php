@@ -9,6 +9,11 @@ class EpiDebug
     $this->messages[$module][] = $message;
   }
 
+  public function getMessages()
+  {
+    return $this->messages;
+  }
+
   public function renderAscii()
   {
     $rowWidth = 100;
