@@ -4,7 +4,7 @@
  *
  * This contains the EpiCode class as wel as the EpiException abstract class
  * @author  Jaisen Mathai <jaisen@jmathai.com>
- * @version 1.0  
+ * @version 1.0
  * @package EpiCode
  */
 class Epi
@@ -31,12 +31,21 @@ class Epi
 
   public static function init()
   {
+    //  Setup the base directory first.
+    if(!self::isPathSet('base')) {
+      self::setPath('base', realpath(dirname(__FILE__)));
+    }
+
     $args = func_get_args();
     if(!empty($args))
     {
       foreach($args as $arg)
         self::loadDependency($arg);
     }
+  }
+
+  public static function isPathSet($name) {
+    return isset(self::$properties["{$name}-path"]);
   }
 
   public static function setPath($name, $path)
