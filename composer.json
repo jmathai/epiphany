@@ -1,0 +1,6 @@
+{
+    "name": "jmathai/epiphany",
+    "require": {
+        "php": ">=5.1.0"
+    }
+}
