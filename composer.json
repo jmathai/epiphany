@@ -1,7 +1,7 @@
 {
     "name": "jmathai/epiphany",
     "require": {
-        "php": ">=5.1.0"
+        "php": ">=5.2.0"
     },
     "autoload": {
         "classmap": ["src"]
