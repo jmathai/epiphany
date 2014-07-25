@@ -1,0 +1,7 @@
+<phpunit bootstrap="./helpers/init.php" colors="true" debug="true">
+  <testsuites>
+    <testsuite name="source">
+        <directory>./</directory>
+    </testsuite>
+  </testsuites>
+</phpunit>

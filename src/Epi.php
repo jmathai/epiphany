@@ -11,11 +11,10 @@ class Epi
 {
   private static $properties = array('exceptions-setting' => false);
   private static $manifest = array(
-    '*' => array('base','route','template','cache','session','database'),
-    'api' => array('EpiApi.php', 'route'),
-    'base' => array('EpiException.php'),
-    'curl' => array('EpiCurl.php'),
-    'debug' => array('EpiDebug.php'),
+    '*' => array('api', 'base','route','template','cache','session','database'),
+    'api' => array('base', 'EpiApi.php', 'route'),
+    'base' => array(),
+    'debug' => array('base', 'EpiDebug.php'),
     'route'  => array('base', 'EpiRoute.php'),
     'template' => array('base', 'EpiTemplate.php'),
     'cache' => array('base', 'EpiCache.php', 'cache-apc', 'cache-file', 'cache-memcached'),
@@ -25,8 +24,7 @@ class Epi
     'config' => array('base', 'EpiConfig.php', 'config-file', 'config-mysql'),
     'config-file' => array('base', 'EpiConfig.php', 'EpiConfig_File.php'),
     'config-mysql' => array('base', 'database', 'EpiConfig.php', 'EpiConfig_MySql.php'),
-    'form' => array('EpiForm.php'),
-    'logger' => array('EpiLogger.php'),
+    'logger' => array('base', 'EpiLogger.php'),
     'session' => array('base', 'EpiSession.php', 'session-php', 'session-apc', 'session-memcached'),
     'session-php' => array('base', 'EpiSession.php', 'EpiSession_Php.php'),
     'session-apc' => array('base', 'EpiSession.php', 'EpiSession_Apc.php'),
@@ -71,7 +69,11 @@ class Epi
     if(!is_array($value))
     {
       if(!isset(self::$included[$value]))
-        include(self::getPath('base') . "/{$value}");
+      {
+          $status = @include(self::getPath('base') . "/{$value}");
+          if(!$status)
+            throw new EpiDependencyException(sprintf('Could not load %s from %s', $value, self::getPath('base')));
+      }
       self::$included[$value] = 1;
     }
     else
@@ -81,3 +83,36 @@ class Epi
     }
   }
 }
+
+/**
+ * @author Jaisen Mathai <jaisen@jmathai.com>
+ * @uses Exception
+ */
+class EpiException extends Exception
+{
+  public static function raise($exception)
+  {
+    $useExceptions = Epi::getSetting('exceptions');
+    if($useExceptions)
+    {
+      throw new $exception($exception->getMessage(), $exception->getCode());
+    }
+    else
+    {
+      echo sprintf("An error occurred and you have <strong>exceptions</strong> disabled so we're displaying the information.
+                    To turn exceptions on you should call: <em>Epi::setSetting('exceptions', true);</em>.
+                    <ul><li>File: %s</li><li>Line: %s</li><li>Message: %s</li><li>Stack trace: %s</li></ul>",
+                    $exception->getFile(), $exception->getLine(), $exception->getMessage(), nl2br($exception->getTraceAsString()));
+    }
+  }
+}
+class EpiDependencyException extends EpiException {}
+class EpiCacheException extends EpiException{}
+class EpiCacheTypeDoesNotExistException extends EpiCacheException{}
+class EpiCacheMemcacheClientDneException extends EpiCacheException{}
+class EpiCacheMemcacheConnectException extends EpiCacheException{}
+class EpiDatabaseException extends EpiException{}
+class EpiDatabaseConnectionException extends EpiDatabaseException{}
+class EpiDatabaseQueryException extends EpiDatabaseException{}
+class EpiSessionException extends EpiException{}
+
