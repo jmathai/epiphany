@@ -1,14 +1,16 @@
 <?php
 class EpiTest extends PHPUnit_Framework_TestCase
 {
-  public function setUp() { }
+  public function setUp()
+  {
+  }
 
   /**
    * @expectedException EpiDependencyException
    */
-  public function testInitNoPathSet()
+  public function testInitFileDne()
   {
-    Epi::init('route');
+    Epi::init('unit-test-file-dne');
   }
 
   public function testInitSuccess()
@@ -24,7 +26,7 @@ class EpiTest extends PHPUnit_Framework_TestCase
     $this->assertNull($actualValue);
   }
 
-  public function testSetPathSuccess()
+  public function testSetPath()
   {
     $name = 'path';
     $value = time();
@@ -40,7 +42,7 @@ class EpiTest extends PHPUnit_Framework_TestCase
     $this->assertFalse($actualValue);
   }
 
-  public function testSetSettingSuccess()
+  public function testSetSetting()
   {
     $name = 'setting';
     $value = time();

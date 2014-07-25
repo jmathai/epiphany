@@ -29,7 +29,8 @@ class Epi
     'session-php' => array('base', 'EpiSession.php', 'EpiSession_Php.php'),
     'session-apc' => array('base', 'EpiSession.php', 'EpiSession_Apc.php'),
     'session-memcached' => array('base', 'EpiSession.php', 'EpiSession_Memcached.php'),
-    'database' => array('base', 'EpiDatabase.php')
+    'database' => array('base', 'EpiDatabase.php'),
+    'unit-test-file-dne' => array('FileDoesNotExist.php')
   );
   private static $included = array();
 
@@ -114,5 +115,9 @@ class EpiCacheMemcacheConnectException extends EpiCacheException{}
 class EpiDatabaseException extends EpiException{}
 class EpiDatabaseConnectionException extends EpiDatabaseException{}
 class EpiDatabaseQueryException extends EpiDatabaseException{}
+class EpiRouteException extends EpiException{}
+class EpiRouteCallbackException extends EpiRouteException{}
+class EpiRouteNotFoundException extends EpiRouteException{}
+
 class EpiSessionException extends EpiException{}
 

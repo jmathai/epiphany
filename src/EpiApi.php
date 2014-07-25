@@ -50,9 +50,7 @@ class EpiApi
       $GLOBALS[$type] = $value;
     }
 
-    $class = new $routeDef['callback'][0];
-    $method = $routeDef['callback'][1];
-    $retval = call_user_func_array(array($class, $method), $routeDef['args']);
+    $retval = call_user_func_array($routeDef['callback'], $routeDef['args']);
 
     // restore sanity
     foreach($tmps as $type => $value)
@@ -100,10 +98,10 @@ class EpiApi
           return array('callback' => $def['callback'], 'args' => $arguments, 'postprocess' => true);
         }
 
-        EpiException::raise(new EpiException('Could not call ' . json_encode($def) . " for route {$regex}"));
+        EpiException::raise(new EpiRouteCallbackException('Could not call ' . json_encode($def) . " for route {$regex}"));
       }
     }
-    EpiException::raise(new EpiException("Could not find route ({$route}) from ({$_SERVER['REQUEST_URI']})"));
+    EpiException::raise(new EpiRouteNotFoundException("Could not find route ({$route}) from ({$_SERVER['REQUEST_URI']})"));
   }
 
   /**
