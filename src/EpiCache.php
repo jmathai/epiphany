@@ -3,10 +3,11 @@ class EpiCache
 {
   const MEMCACHED = 'EpiCache_Memcached';
   const APC = 'EpiCache_Apc';
+  const FILE = 'EpiCache_File';
   private static $instances, $employ;
   private $cached, $hash;
   private function __construct(){}
-  
+
   /*
    * @param  type  required
    * @params optional
@@ -20,12 +21,16 @@ class EpiCache
 
     $type = array_shift($params);
     if(!file_exists($file = dirname(__FILE__) . "/{$type}.php"))
-      EpiException::raise(EpiCacheTypeDoesNotExistException("EpiCache type does not exist: ({$type}).  Tried loading {$file}", 404));
+      EpiException::raise(new EpiCacheTypeDoesNotExistException("EpiCache type does not exist: ({$type}).  Tried loading {$file}", 404));
 
-    require_once $file;
     self::$instances[$hash] = new $type($params);
     self::$instances[$hash]->hash = $hash;
     return self::$instances[$hash];
+  }
+
+  protected function deleteEpiCacheKey($key)
+  {
+    unset($this->cached[$key]);
   }
 
   protected function getEpiCache($key)
@@ -46,7 +51,7 @@ class EpiCache
     $params = func_get_args();
     return $this->get(implode('.', $params));
   }
- 
+
   protected function setByKey()
   {
     $params = func_get_args();

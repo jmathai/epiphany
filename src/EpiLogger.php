@@ -5,21 +5,53 @@ class EpiLogger
   const Warn = 'warn';
   const Crit = 'crit';
 
-  public function __construct() { }
-  
+  private $levels = array('info'=>1,'warn'=>1,'crit'=>1);
+  private static $employ;
+
+  public function __construct()
+  {
+    if(self::$employ)
+    {
+      $this->levels = array();
+      foreach(self::$employ as $level)
+      {
+        $this->levels[$level] = 1;
+      }
+    }
+  }
+
   public function crit($message, $exception = null)
   {
+    if(!isset($this->levels[self::Crit]))
+      return;
+
     $this->log($message, self::Crit, $exception);
   }
-  
+
   public function info($message, $exception = null)
   {
+    if(!isset($this->levels[self::Info]))
+      return;
+
     $this->log($message, self::Info, $exception);
   }
-  
+
   public function warn($message, $exception = null)
   {
+    if(!isset($this->levels[self::Warn]))
+      return;
+
     $this->log($message, self::Warn, $exception);
+  }
+
+  public static function employ(/* consts */)
+  {
+    if(func_num_args() > 0 )
+    {
+      self::$employ = func_get_args();
+    }
+
+    return self::$employ;
   }
 
   private function parseException($exception)

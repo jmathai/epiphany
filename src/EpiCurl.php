@@ -51,7 +51,7 @@ class EpiCurl
 
     $code = curl_multi_add_handle($this->mc, $ch);
     $this->startTimer($key);
-    
+
     // (1)
     if($code === CURLM_OK || $code === CURLM_CALL_MULTI_PERFORM)
     {
@@ -204,6 +204,11 @@ class EpiCurlManager
     $val = self::__get($name);
     return empty($val);
   }
+}
+
+function getCurl()
+{
+  return EpiCurl::getInstance();
 }
 
 /*

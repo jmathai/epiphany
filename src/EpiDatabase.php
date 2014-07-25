@@ -6,7 +6,7 @@ class EpiDatabase
   private $_type, $_name, $_host, $_user, $_pass;
   public $dbh;
   private function __construct(){}
-  
+
   public static function getInstance($type, $name, $host = 'localhost', $user = 'root', $pass = '')
   {
     $args = func_get_args();
@@ -22,14 +22,19 @@ class EpiDatabase
     self::$instances[$hash]->_pass = $pass;
     return self::$instances[$hash];
   }
-  
+
+  /**
+   * @return false in case of error
+   */
   public function execute($sql = false, $params = array())
   {
     $this->init();
     try
     {
       $sth = $this->prepare($sql, $params);
-      if(preg_match('/insert/i', $sql))
+      if(!$sth)
+        return false;
+      else if(preg_match('/^(insert|replace)/i', $sql))
         return $this->dbh->lastInsertId();
       else
         return $sth->rowCount();
@@ -40,7 +45,7 @@ class EpiDatabase
       return false;
     }
   }
-  
+
   public function insertId()
   {
     $this->init();
@@ -50,7 +55,7 @@ class EpiDatabase
     }
     return false;
   }
-  
+
   public function all($sql = false, $params = array())
   {
     $this->init();
@@ -65,7 +70,7 @@ class EpiDatabase
       return false;
     }
   }
-  
+
   public function one($sql = false, $params = array())
   {
     $this->init();
@@ -100,7 +105,14 @@ class EpiDatabase
     try
     {
       $sth = $this->dbh->prepare($sql, array(PDO::ATTR_CURSOR => PDO::CURSOR_FWDONLY));
-      $sth->execute($params);
+      $success = $sth->execute($params);
+      if(!$success)
+      {
+        $err = $sth->errorInfo();
+        $errmsg = $err[2];
+        EpiException::raise(new EpiDatabaseQueryException("Query error: {$errmsg} - {$sql}"));
+        return false;
+      }
       return $sth;
     }
     catch(PDOException $e)
@@ -117,12 +129,26 @@ class EpiDatabase
 
     try
     {
-      $this->dbh = new PDO($this->_type . ':host=' . $this->_host . ';dbname=' . $this->_name, $this->_user, $this->_pass);
+      // eventually split host to use a different
+      //  sql port
+      $host = $this->_host;
+      $host = strtok($host,":");
+      $port = strtok(":");
+
+      $dsn = sprintf('%s:host=%s', $this->_type, $host);
+      if ($port != '') 
+        $dsn .= sprintf(';port=%s', $port);
+      if($this->_name != '')
+        $dsn .= sprintf(';dbname=%s', $this->_name);
+      $dsn .= ';charset=utf8';
+      $this->dbh = new PDO($dsn, $this->_user, $this->_pass, array(
+        PDO::ATTR_PERSISTENT => true
+      ));
       $this->dbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     }
     catch(Exception $e)
     {
-      EpiException::raise(new EpiDatabaseConnectionException('Could not connect to database'));
+      EpiException::raise(new EpiDatabaseConnectionException('Could not connect to database: ' . $e->getMessage()));
     }
   }
 }

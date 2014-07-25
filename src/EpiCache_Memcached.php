@@ -20,7 +20,9 @@ class EpiCache_Memcached extends EpiCache
     if(!$this->connect() || empty($key))
       return false;
 
-    return $this->memcached->delete($key, $timeout);
+    $this->memcached->delete($key, $timeout);
+    $this->deleteEpiCacheKey($key);
+    return true;
   }
 
   public function get($key, $useCache = true)
@@ -60,7 +62,7 @@ class EpiCache_Memcached extends EpiCache
     if(class_exists('Memcached'))
     {
       $this->memcached = new Memcached;
-      
+
       if($this->memcached->addServer($this->host, $this->port))
         return self::$connected = true;
       else

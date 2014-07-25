@@ -10,6 +10,12 @@ class EpiSession_Apc implements EpiSessionInterface
     setcookie(EpiSession::COOKIE, null, time()-86400);
   }
 
+  public function delete($key)
+  {
+    unset($this->store[$key]);
+    apc_store($this->key, $this->store);
+  }
+
   public function get($key = null)
   {
     if(empty($key) || !isset($this->store[$key]))
@@ -27,7 +33,7 @@ class EpiSession_Apc implements EpiSessionInterface
   {
     if(empty($key))
       return false;
-    
+
     $this->store[$key] = $value;
     apc_store($this->key, $this->store);
     return $value;
@@ -39,9 +45,13 @@ class EpiSession_Apc implements EpiSessionInterface
       $key = array_shift($params);
 
     if(empty($key) && empty($_COOKIE[EpiSession::COOKIE]))
+    {
        setcookie(EpiSession::COOKIE, md5(uniqid(rand(), true)), time()+1209600, '/');
-
-    $this->key = empty($key) ? $_COOKIE[EpiSession::COOKIE] : $key;
-    $this->store = $this->getAll();
+    }
+    else
+    {
+      $this->key = empty($key) ? $_COOKIE[EpiSession::COOKIE] : $key;
+      $this->store = $this->getAll();
+    }
   }
 }

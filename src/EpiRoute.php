@@ -4,7 +4,7 @@
  *
  * This contains the EpiRoute class as wel as the EpiException abstract class
  * @author  Jaisen Mathai <jaisen@jmathai.com>
- * @version 1.0  
+ * @version 1.0
  * @package EpiRoute
  */
 
@@ -22,9 +22,9 @@ class EpiRoute
   private $route = null;
   const routeKey= '__route__';
   const httpGet = 'GET';
+  const httpOptions = 'OPTIONS';
   const httpPost= 'POST';
-  const httpPut = 'PUT';
-  const httpDelete = 'DELETE';
+  const httpHead= 'HEAD';
 
   /**
    * get('/', 'function');
@@ -36,6 +36,19 @@ class EpiRoute
   public function get($route, $callback, $isApi = false)
   {
     $this->addRoute($route, $callback, self::httpGet, $isApi);
+    $this->addRoute($route, array($this, 'void'), self::httpHead, $isApi);
+  }
+
+  /**
+   * options('/', 'function');
+   * @name  options
+   * @author  Jaisen Mathai <jaisen@jmathai.com>
+   * @param string $route
+   * @param mixed $callback
+   */
+  public function options($route, $callback, $isApi = false)
+  {
+    $this->addRoute($route, $callback, self::httpOptions, $isApi);
   }
 
   /**
@@ -48,30 +61,6 @@ class EpiRoute
   public function post($route, $callback, $isApi = false)
   {
     $this->addRoute($route, $callback, self::httpPost, $isApi);
-  }
-
-  /**
-   * put('/', 'function');
-   * @name  put
-   * @author  Sandro Meier <sandro.meier@fidelisfactory.ch>
-   * @param string $route
-   * @param mixed $callback
-   */
-  public function put($route, $callback, $isApi = false)
-  {
-    $this->addRoute($route, $callback, self::httpPut, $isApi);
-  }
-  
-  /**
-   * delete('/', 'function');
-   * @name  delete
-   * @author  Sandro Meier <sandro.meier@fidelisfactory.ch>
-   * @param string $route
-   * @param mixed $callback
-   */
-  public function delete($route, $callback, $isApi = false)
-  {
-    $this->addRoute($route, $callback, self::httpDelete, $isApi);
   }
 
   /**
@@ -111,9 +100,17 @@ class EpiRoute
         $this->$method($route['path'], $route['function']);
     }
   }
-  
+
   /**
-   * EpiRoute::run($_GET['__route__'], $_['routes']); 
+   * EpiRoute::void
+   *  Used for HEAD requests as the route handler
+   * @name  void
+   * @author  Jaisen Mathai <jaisen@jmathai.com>
+   */
+  public function void() { }
+
+  /**
+   * EpiRoute::run($_GET['__route__'], $_['routes']);
    * @name  run
    * @author  Jaisen Mathai <jaisen@jmathai.com>
    * @param string $route
@@ -130,28 +127,34 @@ class EpiRoute
       $httpMethod = $_SERVER['REQUEST_METHOD'];
     $routeDef = $this->getRoute($route, $httpMethod);
 
-    $response = call_user_func_array($routeDef['callback'], $routeDef['args']);
+    if(!$routeDef)
+      return;
+
+    $class = new $routeDef['callback'][0];
+    $method = $routeDef['callback'][1];
+    $response = call_user_func_array(array($class, $method), $routeDef['args']);
     if(!$routeDef['postprocess'])
+    {
       return $response;
+    }
     else
     {
-      // Only echo the response if it's not null. 
-      if (!is_null($response))
+      if(isset($response['__callback__']) && !empty($response['__callback__']))
       {
-        $response = json_encode($response);
-        if(isset($_GET['callback']))
-          $response = "{$_GET['callback']}($response)";
-        else
-          header('Content-Type: application/json');
-
-        header('Content-Length:' . strlen($response));
-        echo $response;
+        $cb = $response['__callback__'];
+        unset($response['__callback__']);
+        echo sprintf('%s(%s)', $cb, json_encode($response));
+      }
+      else
+      {
+        echo json_encode($response);
       }
     }
   }
 
+
   /**
-   * EpiRoute::getRoute($route); 
+   * EpiRoute::getRoute($route);
    * @name  getRoute
    * @author  Jaisen Mathai <jaisen@jmathai.com>
    * @param string $route
@@ -198,7 +201,7 @@ class EpiRoute
   }
 
   /**
-   * EpiRoute::redirect($url); 
+   * EpiRoute::redirect($url);
    * @name  redirect
    * @author  Jaisen Mathai <jaisen@jmathai.com>
    * @param string $url

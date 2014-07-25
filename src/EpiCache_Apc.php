@@ -7,13 +7,15 @@ class EpiCache_Apc extends EpiCache
     $this->expiry   = !empty($params[0]) ? $params[0] : 3600;
   }
 
-  public function delete($key)
+  public function delete($key = null)
   {
-    if(empty($key)){
-      return null;
-    }
-    return apc_delete($key);
-  }  
+    if(empty($key))
+      return;
+
+    apc_delete($key);
+    $this->deleteEpiCacheKey($key);
+    return true;
+  }
 
   public function get($key)
   {
@@ -30,11 +32,11 @@ class EpiCache_Apc extends EpiCache
 
   public function set($key = null, $value = null, $expiry = null)
   {
-    if(empty($expiry)) {
-      $expiry = $this->expiry;
-    }
     if(empty($key) || $value === null)
       return false;
+
+    if($expiry === null)
+      $expiry = $this->expiry;
 
     apc_store($key, $value, $expiry);
     $this->setEpiCache($key, $value);

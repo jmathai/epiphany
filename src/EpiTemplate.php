@@ -12,24 +12,22 @@ class EpiTemplate
    */
   public function display($template = null, $vars = null)
   {
-    if(is_array($vars))
-    {
-      extract($vars);
-    }
     $templateInclude = Epi::getPath('view') . '/' . $template;
     if(is_file($templateInclude))
     {
+      if(is_array($vars))
+      {
+        extract($vars);
+      }
+
       include $templateInclude;
-    }
-    else if (is_file($template)) {
-      include $template;
     }
     else
     {
       EpiException::raise(new EpiException("Could not load template: {$templateInclude}", 404));
     }
   }
-  
+
   /**
    * EpiRoute::get('/path/to/template.php', $array);
    * @name  get
@@ -59,9 +57,9 @@ class EpiTemplate
       EpiException::raise(new EpiException("Could not load template: {$templateInclude}", 404));
     }
   }
-  
+
   /**
-   * EpiRoute::json($variable); 
+   * EpiRoute::json($variable);
    * @name  json
    * @author  Jaisen Mathai <jaisen@jmathai.com>
    * @param mixed $data
@@ -81,9 +79,9 @@ class EpiTemplate
       EpiException::raise(new EpiException("json_encode failed for {$dataDump}", 404));
     }
   }
-  
+
   /**
-   * EpiRoute::jsonResponse($variable); 
+   * EpiRoute::jsonResponse($variable);
    * This method echo's JSON data in the header and to the screen and returns.
    * @name  jsonResponse
    * @author  Jaisen Mathai <jaisen@jmathai.com>

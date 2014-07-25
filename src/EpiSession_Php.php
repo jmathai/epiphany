@@ -13,6 +13,11 @@ class EpiSession_Php implements EpiSessionInterface
     session_destroy();
   }
 
+  public function delete($key)
+  {
+    unset($_SESSION[$key]);
+  }
+
   public function get($key = null)
   {
     if(empty($key) || !isset($_SESSION[$key]))
@@ -21,18 +26,22 @@ class EpiSession_Php implements EpiSessionInterface
     return $_SESSION[$key];
   }
 
+  public function getAll()
+  {
+    return $_SESSION;
+  }
+
   public function set($key = null, $value = null)
   {
     if(empty($key))
       return false;
-    
+
     $_SESSION[$key] = $value;
     return $value;
   }
 
   public function __construct()
   {
-    if (!session_id())
-      session_start();
+    session_start();
   }
 }

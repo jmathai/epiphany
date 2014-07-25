@@ -4,6 +4,7 @@ class EpiApi
   private static $instance;
   private $routes = array();
   private $regexes= array();
+  private $invoking = false;
 
   const internal = 'private';
   const external = 'public';
@@ -22,29 +23,23 @@ class EpiApi
       getRoute()->get($route, $callback, true);
   }
 
+  public function options($route, $callback, $visibility = self::internal)
+  {
+    $this->addRoute($route, $callback, EpiRoute::httpOptions);
+    if($visibility === self::external)
+      getRoute()->options($route, $callback, true);
+  }
+
   public function post($route, $callback, $visibility = self::internal)
   {
     $this->addRoute($route, $callback, EpiRoute::httpPost);
     if($visibility === self::external)
       getRoute()->post($route, $callback, true);
   }
-  
-  public function put($route, $callback, $visibility = self::internal)
-  {
-    $this->addRoute($route, $callback, EpiRoute::httpPut);
-    if($visibility === self::external)
-      getRoute()->put($route, $callback, true);
-  }
-  
-  public function delete($route, $callback, $visibility = self::internal)
-  {
-    $this->addRoute($route, $callback, EpiRoute::httpDelete);
-    if($visibility === self::external)
-      getRoute()->delete($route, $callback, true);
-  }
 
   public function invoke($route, $httpMethod = EpiRoute::httpGet, $params = array())
   {
+    $this->invoking = true;
     $routeDef = $this->getRoute($route, $httpMethod);
 
     // this is ugly but required if internal and external calls are to work
@@ -55,17 +50,25 @@ class EpiApi
       $GLOBALS[$type] = $value;
     }
 
-    $retval = call_user_func_array($routeDef['callback'], $routeDef['args']);
+    $class = new $routeDef['callback'][0];
+    $method = $routeDef['callback'][1];
+    $retval = call_user_func_array(array($class, $method), $routeDef['args']);
 
     // restore sanity
     foreach($tmps as $type => $value)
-      $GLOBALS[$type] = $value; 
+      $GLOBALS[$type] = $value;
 
+    $this->invoking = false;
     return $retval;
   }
 
+  public function isInvoking()
+  {
+    return $this->invoking;
+  }
+
   /**
-   * EpiApi::getRoute($route); 
+   * EpiApi::getRoute($route);
    * @name  getRoute
    * @author  Jaisen Mathai <jaisen@jmathai.com>
    * @param string $route
@@ -87,20 +90,20 @@ class EpiApi
         else if(is_array($def['callback']) && method_exists($def['callback'][0], $def['callback'][1]))
         {
           if(Epi::getSetting('debug'))
-            getDebug()->addMessage(__CLASS__, sprintf('Matched %s : %s : %s : %s', $httpMethod, $this->route, json_encode($def['callback']), json_encode($arguments)));
+            getDebug()->addMessage(__CLASS__, sprintf('Matched %s : %s : %s : %s', $httpMethod, $route, json_encode($def['callback']), json_encode($arguments)));
           return array('callback' => $def['callback'], 'args' => $arguments, 'postprocess' => true);
         }
         else if(function_exists($def['callback']))
         {
           if(Epi::getSetting('debug'))
-            getDebug()->addMessage(__CLASS__, sprintf('Matched %s : %s : %s : %s', $httpMethod, $this->route, json_encode($def['callback']), json_encode($arguments)));
+            getDebug()->addMessage(__CLASS__, sprintf('Matched %s : %s : %s : %s', $httpMethod, $route, json_encode($def['callback']), json_encode($arguments)));
           return array('callback' => $def['callback'], 'args' => $arguments, 'postprocess' => true);
         }
 
         EpiException::raise(new EpiException('Could not call ' . json_encode($def) . " for route {$regex}"));
       }
     }
-    EpiException::raise(new EpiException("Could not find route {$this->route} from {$_SERVER['REQUEST_URI']}"));
+    EpiException::raise(new EpiException("Could not find route ({$route}) from ({$_SERVER['REQUEST_URI']})"));
   }
 
   /**

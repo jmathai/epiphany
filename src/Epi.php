@@ -9,43 +9,40 @@
  */
 class Epi
 {
-  private static $properties = array('exceptions-setting' => false, 'debug-setting' => false);
+  private static $properties = array('exceptions-setting' => false);
   private static $manifest = array(
     '*' => array('base','route','template','cache','session','database'),
     'api' => array('EpiApi.php', 'route'),
     'base' => array('EpiException.php'),
-    'cache' => array('base', 'EpiCache.php', 'cache-apc', 'cache-memcached'),
-    'cache-apc' => array('base', 'EpiCache.php', 'EpiCache_Apc.php'),
-    'cache-memcached' => array('base', 'EpiCache.php', 'EpiCache_Memcached.php'),
-    'config' => array('base', 'EpiConfig.php'),
-    'database' => array('base', 'EpiDatabase.php'),
+    'curl' => array('EpiCurl.php'),
     'debug' => array('EpiDebug.php'),
     'route'  => array('base', 'EpiRoute.php'),
+    'template' => array('base', 'EpiTemplate.php'),
+    'cache' => array('base', 'EpiCache.php', 'cache-apc', 'cache-file', 'cache-memcached'),
+    'cache-apc' => array('base', 'EpiCache.php', 'EpiCache_Apc.php'),
+    'cache-file' => array('base', 'EpiCache.php', 'EpiCache_File.php'),
+    'cache-memcached' => array('base', 'EpiCache.php', 'EpiCache_Memcached.php'),
+    'config' => array('base', 'EpiConfig.php', 'config-file', 'config-mysql'),
+    'config-file' => array('base', 'EpiConfig.php', 'EpiConfig_File.php'),
+    'config-mysql' => array('base', 'database', 'EpiConfig.php', 'EpiConfig_MySql.php'),
+    'form' => array('EpiForm.php'),
+    'logger' => array('EpiLogger.php'),
     'session' => array('base', 'EpiSession.php', 'session-php', 'session-apc', 'session-memcached'),
     'session-php' => array('base', 'EpiSession.php', 'EpiSession_Php.php'),
     'session-apc' => array('base', 'EpiSession.php', 'EpiSession_Apc.php'),
     'session-memcached' => array('base', 'EpiSession.php', 'EpiSession_Memcached.php'),
-    'template' => array('base', 'EpiTemplate.php'),
+    'database' => array('base', 'EpiDatabase.php')
   );
   private static $included = array();
 
   public static function init()
   {
-    //  Setup the base directory first.
-    if(!self::isPathSet('base')) {
-      self::setPath('base', realpath(dirname(__FILE__)));
-    }
-
     $args = func_get_args();
     if(!empty($args))
     {
       foreach($args as $arg)
         self::loadDependency($arg);
     }
-  }
-
-  public static function isPathSet($name) {
-    return isset(self::$properties["{$name}-path"]);
   }
 
   public static function setPath($name, $path)
