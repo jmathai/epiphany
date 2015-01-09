@@ -49,7 +49,7 @@ Next we can define the class method to display a list of users. From PHP we can 
         $users = getApi()->invoke('/users.json');
         echo '<ul>';
         foreach($users as $user) {
-          echo "<li>{$user['username']}</li>"
+          echo "<li>{$user['username']}</li>";
         }
         echo '</ul>';
       }
